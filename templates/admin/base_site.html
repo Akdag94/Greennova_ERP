@@ -1,0 +1,132 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | GreenNova ERP{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* 🎨 GREENNOVA KURUMSAL RENK PALETİ */
+    :root {
+        --gn-green: #28a745;
+        --gn-dark-bg: #121212;
+        --gn-panel-bg: #1e1e1e;
+        --gn-text: #e0e0e0;
+        --gn-border: #333333;
+        --gn-yellow: #ffc107;
+    }
+
+    /* 🅰️ GENEL YAZI TİPİ VE ARKA PLAN */
+    body, input, button, select, textarea {
+        font-family: 'Poppins', sans-serif !important;
+        letter-spacing: 0.3px;
+        background-color: var(--gn-dark-bg);
+    }
+
+    /* 🔝 NAVBAR (ÜST BAR) */
+    #header {
+        background: var(--gn-panel-bg) !important;
+        color: var(--gn-text) !important;
+        border-bottom: 2px solid var(--gn-green) !important;
+        height: 65px !important;
+    }
+
+    #branding h1 {
+        margin: 0 !important;
+        background: url("{% static 'admin/img/logo.png' %}") no-repeat left center !important;
+        background-size: contain !important;
+        width: 220px !important;
+        height: 45px !important;
+        font-size: 0 !important;
+    }
+
+    /* 🗄️ ANA PANEL VE TABLO TASARIMI (GÜNCEL!) */
+    .module caption, .module h2 {
+        background: #1a1a1a !important;
+        color: var(--gn-green) !important;
+        font-weight: 700 !important;
+        border-left: 4px solid var(--gn-green) !important;
+        padding: 12px 15px !important;
+        text-transform: uppercase;
+    }
+
+    .module tr th, .module tr td {
+        background: var(--gn-dark-bg) !important;
+        border-bottom: 1px solid var(--gn-border) !important;
+        padding: 14px !important;
+        color: var(--gn-text) !important;
+    }
+
+    .module tr:hover td, .module tr:hover th {
+        background: #1a1a1a !important;
+    }
+
+    /* ➕ ADD VE ✏️ CHANGE BUTONLARI (GHOST STYLE) */
+    .addlink, .changelink {
+        display: inline-block !important;
+        padding: 5px 12px !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase;
+        font-size: 11px !important;
+        transition: all 0.2s !important;
+        text-decoration: none !important;
+        margin-left: 10px !important;
+    }
+
+    /* Yeşil Add Butonu */
+    .addlink {
+        color: var(--gn-green) !important;
+        border: 1px solid var(--gn-green) !important;
+        background: transparent !important;
+    }
+    .addlink:hover {
+        background: var(--gn-green) !important;
+        color: #fff !important;
+    }
+
+    /* Sarı Change Butonu */
+    .changelink {
+        color: var(--gn-yellow) !important;
+        border: 1px solid var(--gn-yellow) !important;
+        background: transparent !important;
+    }
+    .changelink:hover {
+        background: var(--gn-yellow) !important;
+        color: #121212 !important;
+    }
+
+    /* 🔘 KAYDET / SİL BUTONLARI */
+    .submit-row input, .button {
+        background: var(--gn-green) !important;
+        padding: 12px 25px !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2) !important;
+    }
+
+    .deletelink {
+        background: #dc3545 !important;
+        padding: 8px 15px !important;
+        border-radius: 8px !important;
+        color: white !important;
+    }
+
+    /* 📊 BREADCRUMBS */
+    .breadcrumbs {
+        background: var(--gn-panel-bg) !important;
+        border-bottom: 1px solid var(--gn-border) !important;
+        padding: 10px 20px !important;
+    }
+    .breadcrumbs a { color: var(--gn-green) !important; }
+
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">GreenNova ERP</a></h1>
+{% endblock %}

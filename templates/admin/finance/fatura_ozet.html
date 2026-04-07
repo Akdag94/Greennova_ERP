@@ -1,0 +1,36 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block content %}
+  <div style="display: flex; gap: 15px; margin-bottom: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; flex-wrap: wrap;">
+      
+      <div style="background: #28a745; color: white; padding: 20px; border-radius: 12px; flex: 1; min-width: 180px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+          <h3 style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.8;">💰 Toplam Satış</h3>
+          <p style="margin: 10px 0 0; font-size: 26px; font-weight: bold;">{{ ozet_veriler.gelir|default:"0.00" }} ₺</p>
+      </div>
+
+      <div style="background: #ffc107; color: #333; padding: 20px; border-radius: 12px; flex: 1; min-width: 180px; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);">
+          <h3 style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.8;">⏳ Bekleyen Alacak</h3>
+          <p style="margin: 10px 0 0; font-size: 26px; font-weight: bold;">{{ ozet_veriler.alacak|default:"0.00" }} ₺</p>
+          <small style="font-size: 10px; font-weight: bold;">Müşterilerden Gelecek Para</small>
+      </div>
+
+      <div style="background: #dc3545; color: white; padding: 20px; border-radius: 12px; flex: 1; min-width: 180px; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
+          <h3 style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.8;">📉 Şirket Giderleri</h3>
+          <p style="margin: 10px 0 0; font-size: 26px; font-weight: bold;">{{ ozet_veriler.gider|default:"0.00" }} ₺</p>
+      </div>
+
+      <div style="background: #fd7e14; color: white; padding: 20px; border-radius: 12px; flex: 1; min-width: 180px; box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);">
+          <h3 style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.8;">🚜 Müstahsil Borçları</h3>
+          <p style="margin: 10px 0 0; font-size: 26px; font-weight: bold;">{{ ozet_veriler.borc|default:"0.00" }} ₺</p>
+      </div>
+
+      <div style="background: #007bff; color: white; padding: 20px; border-radius: 12px; flex: 1; min-width: 180px; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);">
+          <h3 style="margin: 0; font-size: 13px; text-transform: uppercase; opacity: 0.8;">📊 Net Kâr</h3>
+          <p style="margin: 10px 0 0; font-size: 26px; font-weight: bold;">{{ ozet_veriler.net|default:"0.00" }} ₺</p>
+      </div>
+
+  </div>
+
+  {{ block.super }}
+{% endblock %}

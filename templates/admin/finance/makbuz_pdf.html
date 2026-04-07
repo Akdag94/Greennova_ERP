@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: a4;
+            margin: 1cm;
+        }
+        body { 
+            font-family: 'Helvetica', sans-serif; 
+            color: #333; 
+            font-size: 12px;
+        }
+
+        .header { text-align: center; border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-bottom: 20px; }
+        .header h1 { color: #28a745; margin: 0; font-size: 24px; }
+        .title { font-size: 20px; font-weight: bold; margin-top: 10px; }
+
+        .details-table { width: 100%; margin-bottom: 20px; border: none; }
+        .details-table td { border: none; padding: 5px 0; vertical-align: top; }
+
+        table.main-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table.main-table th, table.main-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        table.main-table th { background-color: #f2f2f2; font-weight: bold; }
+
+        .summary-box { margin-top: 20px; text-align: right; font-size: 14px; font-weight: bold; border-top: 2px solid #eee; padding-top: 10px; }
+        .footer { margin-top: 50px; font-size: 10px; text-align: center; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GREENNOVA TARIM</h1>
+        <div class="title">MUSTAHSIL ALIM MAKBUZU</div>
+    </div>
+
+    <table class="details-table">
+        <tr>
+            <td style="width: 50%;">
+                <strong>Mustahsil:</strong> {{ hareket.mustahsil.ad_soyad|upper }}<br>
+                <strong>Bolge:</strong> {{ hareket.mustahsil.bolge|upper }}
+            </td>
+            <td style="width: 50%; text-align: right;">
+                <strong>Tarih:</strong> {{ tarih|date:"d.m.Y" }}<br>
+                <strong>Makbuz No:</strong> #{{ hareket.id }}
+            </td>
+        </tr>
+    </table>
+
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th>Aciklama</th>
+                <th>Islem Tipi</th>
+                <th style="width: 120px;">Tutar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ hareket.aciklama|default:"Urun Alim Bedeli" }}</td>
+                <td>{{ hareket.get_islem_tipi_display }}</td>
+                <td><strong>{{ hareket.miktar }} TL</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary-box">
+        GUNCEL TOPLAM BAKIYE: {{ hareket.mustahsil.toplam_borc }} TL
+    </div>
+
+    <div class="footer">
+        <p>Bu belge GreenNova ERP sistemi tarafindan otomatik olusturulmustur.</p>
+        <p>Bursa / Turkiye - Greennova Tarim Urunleri</p>
+    </div>
+</body>
+</html>

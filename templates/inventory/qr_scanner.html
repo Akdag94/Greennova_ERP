@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>GreenNova QR Terminal</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background: #121212; color: white; margin: 0; padding: 15px; }
+        #reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: 2px solid #28a745; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .success-card { margin-top: 20px; background: #1e1e1e; padding: 20px; border-radius: 15px; border-left: 8px solid #28a745; text-align: left; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .btn-tir { 
+            display: block; width: 100%; padding: 18px; margin: 12px 0; 
+            background: linear-gradient(145deg, #28a745, #218838); color: white; 
+            border: none; border-radius: 12px; font-size: 17px; font-weight: bold; 
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        }
+        .btn-tir:active { transform: scale(0.96); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .palet-header { color: #28a745; font-size: 1.4em; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .info-row { margin: 8px 0; color: #ddd; font-size: 1.1em; }
+        .badge { background: #28a745; padding: 4px 10px; border-radius: 6px; font-weight: bold; color: black; }
+        hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
+        
+        .status-msg { padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; }
+        .warning { background: #ffc107; color: black; }
+    </style>
+</head>
+<body>
+    <header style="padding: 10px 0 20px 0;">
+        <h2 style="color: #28a745; margin: 0; letter-spacing: 1px;">GREENNOVA SAHA TERMİNALİ</h2>
+        <p style="color: #888; font-size: 0.9em;">Bursa Depo Mal Kabul & Sevkiyat</p>
+    </header>
+
+    <div id="reader"></div>
+
+    <div id="result" style="display:none; max-width: 500px; margin: 0 auto; padding-bottom: 40px;"></div>
+
+    <script>
+        function onScanSuccess(decodedText) {
+            if(window.scanner) {
+                window.scanner.clear().catch(error => console.error("Kamera kapatma hatası:", error));
+            }
+            
+            const paletId = decodedText.replace(/\D/g,''); 
+
+            fetch(`/inventory/api/scan-palet/${paletId}/`)
+                .then(res => res.json())
+                .then(data => {
+                    const resultBox = document.getElementById('result');
+                    resultBox.style.display = 'block';
+
+                    if (data.status === 'success') {
+                        let tirOptions = data.tirlar.length > 0 
+                            ? data.tirlar.map(t => 
+                                `<button onclick="tiraYukle(${data.palet_id}, ${t.id})" class="btn-tir">
+                                    🚛 ${t.plaka} - ${t.gidecegi_yer}
+                                 </button>`
+                            ).join("")
+                            : `<div class="status-msg warning">⚠️ Şu an depoda yüklenecek aktif tır yok!</div>`;
+
+                        // Palet Adedi buraya eklendi
+                        resultBox.innerHTML = `
+                            <div class="success-card">
+                                <div class="palet-header">📦 Palet ID: #${data.palet_id}</div>
+                                <div class="info-row">Ürün: <b>${data.urun}</b></div>
+                                <div class="info-row">Kantar Giriş: <span style="color:#888;">${data.brut_kg} KG</span></div>
+                                <div class="info-row">Yüklenecek (Net): <span class="badge">${data.kg} KG</span></div>
+                                
+                                <div class="info-row">Palet Sayısı: <b style="color: #28a745;">${data.palet_adedi} Adet</b></div>
+                                
+                                <div class="info-row" style="font-size: 0.9em; color: #ffc107;">İşleme Farkı: ${data.fire} KG</div>
+                                <hr>
+                                <p style="color:#888; font-size: 0.9em; margin-bottom:10px;">LÜTFEN HEDEF ARACI SEÇİN:</p>
+                                ${tirOptions}
+                                <button onclick="location.reload()" style="background:none; border:1px solid #444; color:#666; width:100%; margin-top:15px; padding:12px; border-radius:10px; font-weight:bold;">❌ İPTAL ET VE GERİ DÖN</button>
+                            </div>
+                        `;
+                    } else if (data.status === 'warning') {
+                        resultBox.innerHTML = `
+                            <div class="success-card" style="border-left-color: #ffc107;">
+                                <h3 style="color:#ffc107; margin-top:0;">⚠️ UYARI</h3>
+                                <p>${data.message}</p>
+                                <button onclick="location.reload()" class="btn-tir" style="background:#555;">YENİ OKUTMA YAP</button>
+                            </div>
+                        `;
+                    } else {
+                        resultBox.innerHTML = `
+                            <div class="success-card" style="border-left-color: #dc3545;">
+                                <h3 style="color:#dc3545; margin-top:0;">🛑 HATA</h3>
+                                <p>${data.message}</p>
+                                <button onclick="location.reload()" class="btn-tir" style="background:#555;">TEKRAR DENE</button>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(err => {
+                    alert("Bağlantı Hatası: Lütfen internetinizi veya sunucuyu kontrol edin.");
+                    location.reload();
+                });
+        }
+
+        function tiraYukle(pId, sId) {
+            let formData = new FormData();
+            formData.append('palet_id', pId);
+            formData.append('sevkiyat_id', sId);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch('/inventory/api/yukle/', { 
+                method: 'POST', 
+                body: formData 
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === 'success') {
+                    alert(res.message);
+                    location.reload(); 
+                } else {
+                    alert("⚠️ Yükleme hatası: " + res.message);
+                }
+            })
+            .catch(err => alert("Yükleme sırasında teknik hata oluştu!"));
+        }
+
+        let scanner = new Html5QrcodeScanner("reader", { 
+            fps: 20, 
+            qrbox: {width: 280, height: 280},
+            rememberLastUsedCamera: true,
+            aspectRatio: 1.0
+        });
+        window.scanner = scanner;
+        scanner.render(onScanSuccess);
+    </script>
+</body>
+</html>

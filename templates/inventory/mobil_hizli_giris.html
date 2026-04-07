@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GreenNova - Hızlı Mal Kabul</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #1a1a1a; color: #fff; font-family: sans-serif; }
+        .card { background-color: #262626; border: none; border-radius: 15px; }
+        .form-control, .form-select { background-color: #333; border: 1px solid #444; color: #fff; height: 50px; }
+        .form-control:focus { background-color: #3d3d3d; color: #fff; border-color: #28a745; box-shadow: none; }
+        .btn-success { background-color: #28a745; border: none; padding: 15px; font-weight: bold; font-size: 1.2rem; border-radius: 10px; }
+        .camera-btn { background-color: #447e9b; border: none; padding: 20px; width: 100%; border-radius: 10px; margin-bottom: 15px; }
+        label { color: #aaa; font-size: 0.9rem; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <h3 class="text-center mb-4 text-success">🍏 GreenNova Mobil</h3>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card p-4 shadow">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <label>Ürün Fotoğrafı</label>
+            <input type="file" name="foto" id="foto" accept="image/*" capture="environment" class="d-none">
+            <button type="button" class="camera-btn text-white" onclick="document.getElementById('foto').click()">
+                📸 ÜRÜNÜN FOTOĞRAFINI ÇEK
+            </button>
+            <p id="file-name" class="text-info text-center small"></p>
+
+            <div class="mb-3">
+                <label>Ürün Cinsi</label>
+                <select name="urun_id" class="form-select" required>
+                    <option value="">Seçiniz...</option>
+                    {% for urun in urunler %}
+                        <option value="{{ urun.id }}">{{ urun.ad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Müstahsil (Sahibi)</label>
+                <select name="mustahsil_id" class="form-select" required>
+                    <option value="">Seçiniz...</option>
+                    {% for m in mustahsiller %}
+                        <option value="{{ m.id }}">{{ m.ad_soyad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label>Miktar (KG)</label>
+                    <input type="number" step="0.01" name="miktar" class="form-control" placeholder="0.00" required>
+                </div>
+                <div class="col-6 mb-3">
+                    <label>Birim Fiyat (₺)</label>
+                    <input type="number" step="0.01" name="fiyat" class="form-control" placeholder="0.00">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label>Depo Konumu</label>
+                <select name="depo_id" class="form-select" required>
+                    {% for d in depolar %}
+                        <option value="{{ d.id }}">{{ d.ad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 shadow-lg">✅ PALETİ KAYDET</button>
+        </form>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="/admin/inventory/palet/" class="text-decoration-none text-muted small">← Admin Paneline Dön</a>
+    </div>
+</div>
+
+<script>
+    // Fotoğraf seçildiğinde ismini göster
+    document.getElementById('foto').onchange = function() {
+        document.getElementById('file-name').innerHTML = "Seçilen: " + this.files[0].name;
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
