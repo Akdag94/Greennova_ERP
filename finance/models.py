@@ -65,7 +65,8 @@ class CariHareket(models.Model):
 class Sevkiyat(models.Model):
     plaka = models.CharField(max_length=20, verbose_name="Araç Plakası")
     sofor_ad = models.CharField(max_length=100, verbose_name="Şoför Ad Soyad")
-    gidecegi_yer = models.CharField(max_length=200, verbose_name="Varış Noktası")
+    # Gideceği yer artık Müşteriler listesinden seçilecek
+    musteri = models.ForeignKey('Musteri', on_delete=models.CASCADE, verbose_name="Alıcı Müşteri", related_name="sevkiyatlar", null=True)
     cikis_tarihi = models.DateTimeField(default=timezone.now, verbose_name="Çıkış Tarihi")
     tamamlandi = models.BooleanField(default=False, verbose_name="Teslimat Tamamlandı")
     satis_birim_fiyat = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Satış Birim Fiyat (KG/₺)")
@@ -88,22 +89,38 @@ class Sevkiyat(models.Model):
         return round(kar, 2)
 
     def save(self, *args, **kwargs):
-        # 1. Önce tır kaydını oluştur/güncelle
+        # 1. Önce tır kaydını oluştur/güncelle (ID oluşması için önemli)
         super().save(*args, **kwargs)
         
-        # 2. Toplam Satış: Tırdaki paletlerin NET (Paketlenen) kilosu üzerinden hesaplanır.
-        # (Eğer tırda çıkma paleti varsa onun kilosunu da Net KG üzerinden ekler)
+        # 2. Satış Tutarı Hesaplama: Tırdaki paletlerin NET kilosu üzerinden
         toplam_net_kg = self.paletler.aggregate(Sum('miktar_kg'))['miktar_kg__sum'] or 0
         yeni_satis_tutari = float(toplam_net_kg) * float(self.satis_birim_fiyat)
         
-        # 3. Teslimat tamamlandıysa paletleri 'cikti' statüsüne çek
-        if self.tamamlandi:
-            self.paletler.all().update(durum='cikti')
-        
-        # 4. Satış tutarını güncelle ve kaydet
+        # 3. Eğer tutar değiştiyse güncelle (Sonsuz döngüyü önlemek için update_fields kullanıyoruz)
         if float(self.toplam_satis_tutari) != yeni_satis_tutari:
             self.toplam_satis_tutari = yeni_satis_tutari
             super().save(update_fields=['toplam_satis_tutari'])
+
+        # 4. TESLİMAT TAMAMLANDIYSA YAPILACAKLAR
+        if self.tamamlandi:
+            # A) Paletleri 'çıktı' statüsüne çek
+            self.paletler.all().update(durum='cikti')
+            
+            # B) Müşteriye Otomatik Alacak (Borç) Kaydı Oluştur
+            if self.musteri:
+                # Daha önce bu tır için bir satış kaydı oluşturulmuş mu bak (Mükerrer kaydı önler)
+                hareket_var_mi = MusteriHareket.objects.filter(sevkiyat=self, islem_tipi='satis').exists()
+                
+                if not hareket_var_mi:
+                    MusteriHareket.objects.create(
+                        musteri=self.musteri,
+                        sevkiyat=self,
+                        islem_tipi='satis',
+                        miktar=self.toplam_satis_tutari,
+                        tarih=timezone.now().date(),
+                        aciklama=f"{self.plaka} plakalı tır sevkiyatı otomatik alacak kaydı.",
+                        odendi_mi=False
+                    )
 
 # --- OTOMATİK BORÇ HESAPLAMA SİNYALİ ---
 @receiver([post_save, post_delete], sender=CariHareket)

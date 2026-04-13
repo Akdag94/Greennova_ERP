@@ -21,6 +21,7 @@ class MusteriAdmin(ImportExportModelAdmin):
 # --- MÜŞTERİ HAREKETLERİ ---
 @admin.register(MusteriHareket)
 class MusteriHareketAdmin(ImportExportModelAdmin):
+    # 'odendi_mi' alanını list_editable yaptık ki tek tıkla kapatabilesin
     list_display = ('musteri', 'islem_tipi', 'miktar_formatli', 'tarih', 'durum_etiketi', 'odendi_mi', 'sevkiyat')
     list_filter = ('islem_tipi', 'odendi_mi', 'tarih')
     list_editable = ('odendi_mi',)
@@ -55,29 +56,6 @@ class CariHareketAdmin(ImportExportModelAdmin):
             return format_html('<a href="/finance/makbuz/{}/" target="_blank" style="background:#28a745;color:white;padding:3px 8px;border-radius:4px;text-decoration:none;">📄 Yazdır</a>', obj.id)
         return "-"
 
-    # 🔥 CARİ HAREKETLER LİSTESİNDE DASHBOARD GÖRÜNSÜN DERSEN BURAYA DA EKLİYORUZ:
-    def changelist_view(self, request, extra_context=None):
-        gelir = Sevkiyat.objects.aggregate(Sum('toplam_satis_tutari'))['toplam_satis_tutari__sum'] or 0
-        gider = Gider.objects.aggregate(Sum('miktar'))['miktar__sum'] or 0
-        borc = Mustahsil.objects.aggregate(Sum('toplam_borc'))['toplam_borc__sum'] or 0
-        alacak = Musteri.objects.aggregate(Sum('toplam_alacagimiz'))['toplam_alacagimiz__sum'] or 0
-        
-        extra_context = extra_context or {}
-        extra_context['ozet_veriler'] = {
-            'gelir': "{:,.2f}".format(gelir).replace(",", "X").replace(".", ",").replace("X", "."),
-            'gider': "{:,.2f}".format(gider).replace(",", "X").replace(".", ",").replace("X", "."),
-            'borc': "{:,.2f}".format(borc).replace(",", "X").replace(".", ",").replace("X", "."),
-            'alacak': "{:,.2f}".format(alacak).replace(",", "X").replace(".", ",").replace("X", "."),
-            'net': "{:,.2f}".format(float(gelir) - float(gider)).replace(",", "X").replace(".", ",").replace("X", "."),
-        }
-        return super().changelist_view(request, extra_context=extra_context)
-
-@admin.register(Gider)
-class GiderAdmin(ImportExportModelAdmin):
-    list_display = ('baslik', 'kategori', 'miktar', 'tarih')
-    list_filter = ('kategori', 'tarih')
-    search_fields = ('baslik', 'aciklama')
-
 # --- SEVKİYAT (TIR) YÖNETİMİ ---
 class PaletInline(admin.TabularInline):
     model = Palet
@@ -87,55 +65,30 @@ class PaletInline(admin.TabularInline):
 
 @admin.register(Sevkiyat)
 class SevkiyatAdmin(ImportExportModelAdmin):
-    # list_display içine 'toplam_satis_tutari_goster' fonksiyonunu ekledik
-    list_display = ('plaka', 'gidecegi_yer', 'toplam_tonaj', 'palet_sayisi_ozeti', 'toplam_satis_tutari_goster', 'kar_durumu', 'tamamlandi')
-    list_filter = ('tamamlandi', 'cikis_tarihi')
-    search_fields = ('plaka', 'sofor_ad')
+    # 'gidecegi_yer' yerine 'musteri' eklendi
+    list_display = ('plaka', 'musteri', 'toplam_tonaj', 'palet_sayisi_ozeti', 'toplam_satis_tutari_goster', 'kar_durumu', 'tamamlandi')
+    list_filter = ('tamamlandi', 'cikis_tarihi', 'musteri')
+    search_fields = ('plaka', 'sofor_ad', 'musteri__unvan')
     inlines = [PaletInline]
+    autocomplete_fields = ['musteri']
 
-    # --- YENİ: Toplam Satış Tutarı (Mal Bedeli) Gösterimi ---
     def toplam_satis_tutari_goster(self, obj):
-        # Modelindeki toplam_satis_tutari alanını TL formatında gösterir
         tutar = obj.toplam_satis_tutari or 0
         tutar_formatli = "{:,.2f} ₺".format(tutar).replace(",", "X").replace(".", ",").replace("X", ".")
         return format_html('<b style="color: #007bff;">{}</b>', tutar_formatli)
     toplam_satis_tutari_goster.short_description = "Toplam Mal Bedeli"
 
-    # --- GÜNCELLEME: Kar Durumu ---
     def kar_durumu(self, obj):
         try:
-            # Modelindeki kar_zarar_durumu() fonksiyonunu çağırıyoruz
             kar = obj.kar_zarar_durumu()
             if kar is None: kar = 0
-            
             renk = "#28a745" if kar >= 0 else "#dc3545"
             simge = "▲" if kar >= 0 else "▼"
             kar_formatli = "{:,.2f} ₺".format(kar).replace(",", "X").replace(".", ",").replace("X", ".")
-            
             return format_html('<b style="color: {};">{} {}</b>', renk, simge, kar_formatli)
         except Exception as e:
-            # Eğer modeldeki fonksiyonda hata varsa admin panelinde hatayı küçük harfle gösterir
-            return format_html('<span style="color: gray;">Hesap hatası: {}</span>', str(e)[:20])
+            return format_html('<span style="color: gray;">Hesap hatası</span>')
     kar_durumu.short_description = "Net Kâr/Zarar"
-
-    # Diğer fonksiyonların (tonaj, palet özeti, changelist_view) aynen kalsın...
-    # 🔥 SEVKİYAT LİSTESİNDE DASHBOARD GÖRÜNSÜN DERSEN BURAYA DA EKLİYORUZ:
-    def changelist_view(self, request, extra_context=None):
-        gelir = Sevkiyat.objects.aggregate(Sum('toplam_satis_tutari'))['toplam_satis_tutari__sum'] or 0
-        gider = Gider.objects.aggregate(Sum('miktar'))['miktar__sum'] or 0
-        borc = Mustahsil.objects.aggregate(Sum('toplam_borc'))['toplam_borc__sum'] or 0
-        alacak = Musteri.objects.aggregate(Sum('toplam_alacagimiz'))['toplam_alacagimiz__sum'] or 0
-        
-        extra_context = extra_context or {}
-        extra_context['ozet_veriler'] = {
-            'gelir': "{:,.2f}".format(gelir).replace(",", "X").replace(".", ",").replace("X", "."),
-            'gider': "{:,.2f}".format(gider).replace(",", "X").replace(".", ",").replace("X", "."),
-            'borc': "{:,.2f}".format(borc).replace(",", "X").replace(".", ",").replace("X", "."),
-            'alacak': "{:,.2f}".format(alacak).replace(",", "X").replace(".", ",").replace("X", "."),
-            'net': "{:,.2f}".format(float(gelir) - float(gider)).replace(",", "X").replace(".", ",").replace("X", "."),
-        }
-        return super().changelist_view(request, extra_context=extra_context)
-    
 
     def toplam_tonaj(self, obj):
         toplam = obj.paletler.aggregate(Sum('miktar_kg'))['miktar_kg__sum'] or 0
@@ -145,8 +98,32 @@ class SevkiyatAdmin(ImportExportModelAdmin):
         adet = obj.paletler.aggregate(Sum('toplam_palet_adedi'))['toplam_palet_adedi__sum'] or 0
         return format_html('<b>{} Palet</b>', adet)
 
+    # 🔥 DASHBOARD GÜNCELLEMESİ: BEKLEYEN ALACAKLAR EKLENDİ
+    def changelist_view(self, request, extra_context=None):
+        gelir = Sevkiyat.objects.aggregate(Sum('toplam_satis_tutari'))['toplam_satis_tutari__sum'] or 0
+        gider = Gider.objects.aggregate(Sum('miktar'))['miktar__sum'] or 0
+        borc = Mustahsil.objects.aggregate(Sum('toplam_borc'))['toplam_borc__sum'] or 0
+        alacak = Musteri.objects.aggregate(Sum('toplam_alacagimiz'))['toplam_alacagimiz__sum'] or 0
         
-    
+        # Sadece ödenmemiş satışların toplamı
+        bekleyen_alacak = MusteriHareket.objects.filter(odendi_mi=False, islem_tipi='satis').aggregate(Sum('miktar'))['miktar__sum'] or 0
+        
+        extra_context = extra_context or {}
+        extra_context['ozet_veriler'] = {
+            'gelir': "{:,.2f}".format(gelir).replace(",", "X").replace(".", ",").replace("X", "."),
+            'gider': "{:,.2f}".format(gider).replace(",", "X").replace(".", ",").replace("X", "."),
+            'borc': "{:,.2f}".format(borc).replace(",", "X").replace(".", ",").replace("X", "."),
+            'alacak': "{:,.2f}".format(alacak).replace(",", "X").replace(".", ",").replace("X", "."),
+            'bekleyen': "{:,.2f}".format(bekleyen_alacak).replace(",", "X").replace(".", ",").replace("X", "."),
+            'net': "{:,.2f}".format(float(gelir) - float(gider)).replace(",", "X").replace(".", ",").replace("X", "."),
+        }
+        return super().changelist_view(request, extra_context=extra_context)
+
+@admin.register(Gider)
+class GiderAdmin(ImportExportModelAdmin):
+    list_display = ('baslik', 'kategori', 'miktar', 'tarih')
+    list_filter = ('kategori', 'tarih')
+    search_fields = ('baslik', 'aciklama')
 
 # Admin Genel Başlıkları
 admin.site.index_title = "GreenNova ERP - Yönetim Paneli"
