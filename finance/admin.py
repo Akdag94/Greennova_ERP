@@ -87,11 +87,38 @@ class PaletInline(admin.TabularInline):
 
 @admin.register(Sevkiyat)
 class SevkiyatAdmin(ImportExportModelAdmin):
-    list_display = ('plaka', 'gidecegi_yer', 'toplam_tonaj', 'palet_sayisi_ozeti', 'toplam_satis_tutari', 'kar_durumu', 'tamamlandi')
+    # list_display içine 'toplam_satis_tutari_goster' fonksiyonunu ekledik
+    list_display = ('plaka', 'gidecegi_yer', 'toplam_tonaj', 'palet_sayisi_ozeti', 'toplam_satis_tutari_goster', 'kar_durumu', 'tamamlandi')
     list_filter = ('tamamlandi', 'cikis_tarihi')
     search_fields = ('plaka', 'sofor_ad')
     inlines = [PaletInline]
 
+    # --- YENİ: Toplam Satış Tutarı (Mal Bedeli) Gösterimi ---
+    def toplam_satis_tutari_goster(self, obj):
+        # Modelindeki toplam_satis_tutari alanını TL formatında gösterir
+        tutar = obj.toplam_satis_tutari or 0
+        tutar_formatli = "{:,.2f} ₺".format(tutar).replace(",", "X").replace(".", ",").replace("X", ".")
+        return format_html('<b style="color: #007bff;">{}</b>', tutar_formatli)
+    toplam_satis_tutari_goster.short_description = "Toplam Mal Bedeli"
+
+    # --- GÜNCELLEME: Kar Durumu ---
+    def kar_durumu(self, obj):
+        try:
+            # Modelindeki kar_zarar_durumu() fonksiyonunu çağırıyoruz
+            kar = obj.kar_zarar_durumu()
+            if kar is None: kar = 0
+            
+            renk = "#28a745" if kar >= 0 else "#dc3545"
+            simge = "▲" if kar >= 0 else "▼"
+            kar_formatli = "{:,.2f} ₺".format(kar).replace(",", "X").replace(".", ",").replace("X", ".")
+            
+            return format_html('<b style="color: {};">{} {}</b>', renk, simge, kar_formatli)
+        except Exception as e:
+            # Eğer modeldeki fonksiyonda hata varsa admin panelinde hatayı küçük harfle gösterir
+            return format_html('<span style="color: gray;">Hesap hatası: {}</span>', str(e)[:20])
+    kar_durumu.short_description = "Net Kâr/Zarar"
+
+    # Diğer fonksiyonların (tonaj, palet özeti, changelist_view) aynen kalsın...
     # 🔥 SEVKİYAT LİSTESİNDE DASHBOARD GÖRÜNSÜN DERSEN BURAYA DA EKLİYORUZ:
     def changelist_view(self, request, extra_context=None):
         gelir = Sevkiyat.objects.aggregate(Sum('toplam_satis_tutari'))['toplam_satis_tutari__sum'] or 0
@@ -108,6 +135,7 @@ class SevkiyatAdmin(ImportExportModelAdmin):
             'net': "{:,.2f}".format(float(gelir) - float(gider)).replace(",", "X").replace(".", ",").replace("X", "."),
         }
         return super().changelist_view(request, extra_context=extra_context)
+    
 
     def toplam_tonaj(self, obj):
         toplam = obj.paletler.aggregate(Sum('miktar_kg'))['miktar_kg__sum'] or 0
@@ -117,13 +145,8 @@ class SevkiyatAdmin(ImportExportModelAdmin):
         adet = obj.paletler.aggregate(Sum('toplam_palet_adedi'))['toplam_palet_adedi__sum'] or 0
         return format_html('<b>{} Palet</b>', adet)
 
-    def kar_durumu(self, obj):
-        try:
-            kar = obj.kar_zarar_durumu()
-            renk = "#28a745" if kar >= 0 else "#dc3545"
-            return format_html('<b style="color: {};">{:,.2f} TL</b>', renk, kar).replace(",", "X").replace(".", ",").replace("X", ".")
-        except:
-            return "0,00 TL"
+        
+    
 
 # Admin Genel Başlıkları
 admin.site.index_title = "GreenNova ERP - Yönetim Paneli"

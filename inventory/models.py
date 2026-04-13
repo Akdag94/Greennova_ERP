@@ -127,6 +127,8 @@ class Palet(models.Model):
             self.fire_miktar_kg = float(self.brut_miktar_kg) - float(self.miktar_kg)
         else:
             self.fire_miktar_kg = 0
+
+            
         
         # 3. VERİTABANI DURUM SENKRONİZASYONU
         if self.sevkiyat:
@@ -158,6 +160,12 @@ class Palet(models.Model):
             fname = f'qr-{self.id}.png'
             self.qr_kod.save(fname, File(buffer), save=False)
             super().save(update_fields=['qr_kod'])
+
+def save(self, *args, **kwargs):
+    # Eğer bir oda seçilmişse ve durum hala "İşleniyor" ise otomatik "Depoda" yap
+    if self.oda and self.durum == 'isleniyor':
+        self.durum = 'depoda'
+    super().save(*args, **kwargs)
 
 # --- SİNYALLER (CARİ HAREKET) ---
 @receiver(post_save, sender=Palet)
