@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from django.db import models  # 🔥 BU EKSİKTİ, EKLENDİ
 from .models import Palet, UrunKategorisi, Depo
 from finance.models import Sevkiyat, Mustahsil
 from django.views.decorators.csrf import csrf_exempt
@@ -28,8 +29,12 @@ def scan_palet_api(request, palet_id):
                 'message': f'Bu palet (#{palet.palet_no}) zaten {status_text} ({tir_plaka})!',
             })
 
-        # HATA DÜZELTİLDİ: varis_yeri -> gidecegi_yer yapıldı
-        aktif_tirlar = Sevkiyat.objects.filter(tamamlandi=False).values('id', 'plaka', 'gidecegi_yer')
+        # ✅ GÜNCELLEME: 'gidecegi_yer' yerine 'musteri__unvan' mühürlendi
+        aktif_tirlar = Sevkiyat.objects.filter(tamamlandi=False).values(
+            'id', 
+            'plaka', 
+            varis_yeri=models.F('musteri__unvan')
+        )
         
         if not aktif_tirlar.exists():
             return JsonResponse({
@@ -37,15 +42,14 @@ def scan_palet_api(request, palet_id):
                 'message': 'Sistemde yükleme yapılabilecek aktif bir tır (Sevkiyat) bulunamadı!'
             })
 
-        # GÜNCELLEME: 'palet_adedi' verisi JSON'a eklendi
         return JsonResponse({
             'status': 'success',
             'palet_id': palet.id,
             'palet_no': palet.palet_no,
-            'kg': str(palet.miktar_kg or 0),       # Paketlenen Net KG
-            'brut_kg': str(palet.brut_miktar_kg),  # Kantar KG
-            'fire': str(palet.fire_miktar_kg),     # Fire KG
-            'palet_adedi': palet.toplam_palet_adedi, # ARADIĞIN VERİ BURADA
+            'kg': str(palet.miktar_kg or 0),
+            'brut_kg': str(palet.brut_miktar_kg),
+            'fire': str(palet.fire_miktar_kg),
+            'palet_adedi': palet.toplam_palet_adedi,
             'urun': palet.urun_cinsi.ad if palet.urun_cinsi else "Belirtilmemiş",
             'tirlar': list(aktif_tirlar)
         })
@@ -79,9 +83,6 @@ def paleti_tira_yukle_api(request):
 
 # --- MOBİL SAHA HIZLI GİRİŞ ---
 def mobil_hizli_giris(request):
-    """
-    Sahada telefonla fotoğraf çekip hızlıca palet oluşturma ekranı.
-    """
     if request.method == "POST":
         try:
             urun_id = request.POST.get('urun_id')
