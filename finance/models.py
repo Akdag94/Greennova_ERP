@@ -77,7 +77,8 @@ class Sevkiyat(models.Model):
         verbose_name_plural = "Sevkiyatlar ve Tırlar"
 
     def __str__(self):
-        return f"{self.plaka} - {self.gidecegi_yer}"
+        # En güvenli hali budur, musteri yoksa bile hata vermez
+        return f"{self.plaka} - {self.musteri.unvan if self.musteri else 'Müşteri Yok'}"
 
     def kar_zarar_durumu(self):
         # MUDANYA HESABI: 
