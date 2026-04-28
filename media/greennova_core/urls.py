@@ -11,7 +11,7 @@ from finance.print_views import (
     sevkiyat_irsaliye, gider_makbuzu, gider_raporu,
 )
 from inventory import views as inv_views
-from greennova_core.site_views import anasayfa, yardim, musteri_detay, mustahsil_detay, gider_detay
+from greennova_core.site_views import anasayfa, yardim
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -19,14 +19,6 @@ urlpatterns = [
     # Ana sayfa ve rehber
     path('', anasayfa, name='anasayfa'),
     path('site/yardim/', yardim, name='yardim'),
-
-    # Detay sayfaları (tıklanınca kim neden)
-    path('site/detay/musteri/<int:musteri_id>/', musteri_detay, name='musteri_detay'),
-    path('site/detay/mustahsil/<int:mustahsil_id>/', mustahsil_detay, name='mustahsil_detay'),
-    path('site/detay/giderler/', gider_detay, name='gider_detay'),
-    # Liste sayfaları (ana sayfadaki "Tümü" linkleri için)
-    path('site/detay/musteri/', musteri_detay, {'musteri_id': None}, name='musteri_liste'),
-    path('site/detay/mustahsil/', mustahsil_detay, {'mustahsil_id': None}, name='mustahsil_liste'),
 
     # ====================================================
     # INVENTORY — Depo ve QR

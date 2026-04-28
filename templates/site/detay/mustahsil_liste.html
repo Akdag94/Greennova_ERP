@@ -1,0 +1,45 @@
+{% extends 'site/base.html' %}
+{% block title %}Müstahsil Borçlarımız{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:0 auto;padding:20px 16px;">
+    <a href="/" style="color:#666;font-size:13px;display:inline-block;margin-bottom:14px;">← Ana Sayfa</a>
+    <div style="background:linear-gradient(135deg,#1a0a00,#7d2700);color:white;padding:22px 26px;border-radius:12px;margin-bottom:18px;">
+        <h1 style="font-size:20px;font-weight:800;margin:0 0 5px;">🔴 Müstahsil Borçlarımız</h1>
+        <div style="opacity:.75;font-size:13px;">Toplam: <b>{{ toplam_borc }} ₺</b></div>
+    </div>
+    <div style="background:white;border-radius:10px;border:1px solid #dee2e6;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+            <thead><tr style="background:#f8f9fa;">
+                <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;">Müstahsil</th>
+                <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;">Bölge</th>
+                <th style="padding:10px 14px;text-align:right;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;">Borcumuz</th>
+                <th style="padding:10px 14px;border-bottom:2px solid #dee2e6;"></th>
+            </tr></thead>
+            <tbody>
+                {% for m in mustahsiller %}
+                <tr style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:10px 14px;font-size:13px;font-weight:600;">{{ m.ad_soyad }}</td>
+                    <td style="padding:10px 14px;font-size:13px;color:#666;">{{ m.bolge|default:"—" }}</td>
+                    <td style="padding:10px 14px;text-align:right;">
+                        {% if m.toplam_borc > 0 %}
+                            <b style="color:#c0392b;">{{ m.toplam_borc|floatformat:2 }} ₺</b>
+                        {% elif m.toplam_borc < 0 %}
+                            <b style="color:#155724;">{{ m.toplam_borc|floatformat:2 }} ₺</b>
+                        {% else %}
+                            <span style="color:#888;">✅ Kapalı</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:10px 14px;">
+                        <a href="/site/detay/mustahsil/{{ m.id }}/" style="background:#c0392b;color:white;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;text-decoration:none;">Detay</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center;color:#888;padding:20px;">Kayıt yok.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

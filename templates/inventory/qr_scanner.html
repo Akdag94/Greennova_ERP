@@ -1,137 +1,514 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>GreenNova QR Terminal</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    {# === PWA === #}
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#28a745">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GreenNova">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background: #121212; color: white; margin: 0; padding: 15px; }
-        #reader { width: 100%; max-width: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: 2px solid #28a745; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .success-card { margin-top: 20px; background: #1e1e1e; padding: 20px; border-radius: 15px; border-left: 8px solid #28a745; text-align: left; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .btn-tir { 
-            display: block; width: 100%; padding: 18px; margin: 12px 0; 
-            background: linear-gradient(145deg, #28a745, #218838); color: white; 
-            border: none; border-radius: 12px; font-size: 17px; font-weight: bold; 
-            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #121212; color: #fff; margin: 0; padding: 12px;
         }
-        .btn-tir:active { transform: scale(0.96); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        
-        .palet-header { color: #28a745; font-size: 1.4em; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
-        .info-row { margin: 8px 0; color: #ddd; font-size: 1.1em; }
+        header {
+            text-align: center; padding: 8px 0 16px;
+        }
+        header h2 { color: #28a745; margin: 0; letter-spacing: 1px; font-size: 18px; }
+        header p { color: #888; font-size: 11px; margin: 4px 0 0; }
+
+        /* Online/Offline durum göstergesi */
+        #online-badge {
+            position: fixed; top: 8px; right: 8px;
+            padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 700; z-index: 1000;
+            transition: background 0.3s;
+        }
+        #online-badge.online { background: #28a745; color: white; }
+        #online-badge.offline { background: #dc3545; color: white; }
+
+        /* Sync badge (kuyruk sayısı) */
+        #sync-badge {
+            position: fixed; top: 8px; left: 8px;
+            padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 700; z-index: 1000;
+            background: #ffc107; color: #333; display: none;
+        }
+        #sync-badge.visible { display: block; }
+
+        #reader {
+            width: 100%; max-width: 500px; margin: 0 auto;
+            border-radius: 15px; overflow: hidden;
+            border: 2px solid #28a745; background: #000;
+        }
+
+        .success-card {
+            margin-top: 16px; background: #1e1e1e; padding: 18px;
+            border-radius: 14px; border-left: 6px solid #28a745;
+            text-align: left; animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .btn-tir {
+            display: block; width: 100%; padding: 16px; margin: 10px 0;
+            background: linear-gradient(145deg, #28a745, #218838); color: white;
+            border: none; border-radius: 11px; font-size: 16px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-tir:active { transform: scale(0.96); }
+
+        .palet-header { color: #28a745; font-size: 1.3em; margin-bottom: 6px; }
+        .info-row { margin: 6px 0; color: #ddd; font-size: 1em; }
         .badge { background: #28a745; padding: 4px 10px; border-radius: 6px; font-weight: bold; color: black; }
-        hr { border: 0; border-top: 1px solid #333; margin: 20px 0; }
-        
-        .status-msg { padding: 10px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; }
-        .warning { background: #ffc107; color: black; }
+        hr { border: 0; border-top: 1px solid #333; margin: 16px 0; }
+
+        /* Offline kuyruk listesi */
+        #queue-section {
+            background: #1e1e1e; border-radius: 12px; padding: 12px;
+            margin-top: 16px; max-width: 500px; margin-left: auto; margin-right: auto;
+            display: none;
+        }
+        #queue-section.visible { display: block; }
+        #queue-section h4 { margin: 0 0 8px; color: #ffc107; font-size: 13px; }
+        .queue-item {
+            background: #2a2a2a; padding: 8px 12px; border-radius: 6px;
+            margin-bottom: 5px; font-size: 12px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .queue-item .pending { color: #ffc107; }
+        .queue-item .done { color: #28a745; }
+        .queue-item .fail { color: #dc3545; }
+
+        #manual-input {
+            margin-top: 12px; background: #1e1e1e; padding: 12px;
+            border-radius: 10px; max-width: 500px; margin-left: auto; margin-right: auto;
+        }
+        #manual-input input {
+            width: calc(100% - 86px); padding: 10px;
+            border: 1px solid #444; border-radius: 6px;
+            background: #2a2a2a; color: white; font-size: 14px;
+        }
+        #manual-input button {
+            width: 80px; padding: 10px; background: #28a745;
+            border: none; color: white; border-radius: 6px;
+            font-weight: bold; cursor: pointer; margin-left: 6px;
+        }
     </style>
 </head>
 <body>
-    <header style="padding: 10px 0 20px 0;">
-        <h2 style="color: #28a745; margin: 0; letter-spacing: 1px;">GREENNOVA SAHA TERMİNALİ</h2>
-        <p style="color: #888; font-size: 0.9em;">Bursa Depo Mal Kabul & Sevkiyat</p>
-    </header>
 
-    <div id="reader"></div>
+<div id="online-badge" class="online">📡 ONLINE</div>
+<div id="sync-badge">⏳ <span id="queue-count">0</span> bekliyor</div>
 
-    <div id="result" style="display:none; max-width: 500px; margin: 0 auto; padding-bottom: 40px;"></div>
+<header>
+    <h2>GREENNOVA SAHA TERMİNALİ</h2>
+    <p>QR Kod Tarayıcı | Offline Destekli</p>
+</header>
 
-    <script>
-        function onScanSuccess(decodedText) {
-            if(window.scanner) {
-                window.scanner.clear().catch(error => console.error("Kamera kapatma hatası:", error));
+<div id="reader"></div>
+
+<div id="result" style="display:none; max-width: 500px; margin: 16px auto;"></div>
+
+<div id="manual-input">
+    <input type="text" id="manual-code" placeholder="Manuel palet ID gir..." inputmode="numeric">
+    <button onclick="manuelKodGir()">Tara</button>
+</div>
+
+<div id="queue-section">
+    <h4>📋 Senkronizasyon Kuyruğu</h4>
+    <div id="queue-list"></div>
+    <button onclick="kuyrugaSenkronEt()" style="width:100%; margin-top:10px; padding:10px; background:#007bff; border:0; color:white; border-radius:8px; font-weight:bold; cursor:pointer;">
+        🔄 ŞİMDİ SENKRONİZE ET
+    </button>
+</div>
+
+<script>
+// =========================================================
+// PWA + OFFLINE SYNC + CONFLICT RESOLUTION
+// =========================================================
+
+const CSRF_TOKEN = '{{ csrf_token }}';
+let html5QrcodeScanner = null;
+let aktifPaletData = null; // QR sonrası palet bilgisi (online'da getirilen)
+
+// ---- IndexedDB: offline kuyruk ----
+const DB_NAME = 'greennova_sync';
+const STORE_NAME = 'queue';
+let db = null;
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            const idb = e.target.result;
+            if (!idb.objectStoreNames.contains(STORE_NAME)) {
+                const store = idb.createObjectStore(STORE_NAME, { keyPath: 'client_id' });
+                store.createIndex('status', 'status', { unique: false });
+                store.createIndex('created_at', 'created_at', { unique: false });
             }
-            
-            const paletId = decodedText.replace(/\D/g,''); 
+        };
+        req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+        req.onerror = (e) => reject(e);
+    });
+}
 
-            fetch(`/inventory/api/scan-palet/${paletId}/`)
-                .then(res => res.json())
-                .then(data => {
-                    const resultBox = document.getElementById('result');
-                    resultBox.style.display = 'block';
+async function queueAdd(operation) {
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(operation);
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e);
+    });
+}
 
-                    if (data.status === 'success') {
-                        let tirOptions = data.tirlar.length > 0 
-                            ? data.tirlar.map(t => 
-                                `<button onclick="tiraYukle(${data.palet_id}, ${t.id})" class="btn-tir">
-                                    🚛 ${t.plaka} - ${t.gidecegi_yer}
-                                 </button>`
-                            ).join("")
-                            : `<div class="status-msg warning">⚠️ Şu an depoda yüklenecek aktif tır yok!</div>`;
+async function queueGetAll(statusFilter = null) {
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+        req.onsuccess = (e) => {
+            let items = e.target.result || [];
+            if (statusFilter) items = items.filter(i => i.status === statusFilter);
+            resolve(items);
+        };
+        req.onerror = (e) => reject(e);
+    });
+}
 
-                        // Palet Adedi buraya eklendi
-                        resultBox.innerHTML = `
-                            <div class="success-card">
-                                <div class="palet-header">📦 Palet ID: #${data.palet_id}</div>
-                                <div class="info-row">Ürün: <b>${data.urun}</b></div>
-                                <div class="info-row">Kantar Giriş: <span style="color:#888;">${data.brut_kg} KG</span></div>
-                                <div class="info-row">Yüklenecek (Net): <span class="badge">${data.kg} KG</span></div>
-                                
-                                <div class="info-row">Palet Sayısı: <b style="color: #28a745;">${data.palet_adedi} Adet</b></div>
-                                
-                                <div class="info-row" style="font-size: 0.9em; color: #ffc107;">İşleme Farkı: ${data.fire} KG</div>
-                                <hr>
-                                <p style="color:#888; font-size: 0.9em; margin-bottom:10px;">LÜTFEN HEDEF ARACI SEÇİN:</p>
-                                ${tirOptions}
-                                <button onclick="location.reload()" style="background:none; border:1px solid #444; color:#666; width:100%; margin-top:15px; padding:12px; border-radius:10px; font-weight:bold;">❌ İPTAL ET VE GERİ DÖN</button>
-                            </div>
-                        `;
-                    } else if (data.status === 'warning') {
-                        resultBox.innerHTML = `
-                            <div class="success-card" style="border-left-color: #ffc107;">
-                                <h3 style="color:#ffc107; margin-top:0;">⚠️ UYARI</h3>
-                                <p>${data.message}</p>
-                                <button onclick="location.reload()" class="btn-tir" style="background:#555;">YENİ OKUTMA YAP</button>
-                            </div>
-                        `;
-                    } else {
-                        resultBox.innerHTML = `
-                            <div class="success-card" style="border-left-color: #dc3545;">
-                                <h3 style="color:#dc3545; margin-top:0;">🛑 HATA</h3>
-                                <p>${data.message}</p>
-                                <button onclick="location.reload()" class="btn-tir" style="background:#555;">TEKRAR DENE</button>
-                            </div>
-                        `;
-                    }
-                })
-                .catch(err => {
-                    alert("Bağlantı Hatası: Lütfen internetinizi veya sunucuyu kontrol edin.");
-                    location.reload();
-                });
-        }
+async function queueUpdate(client_id, patch) {
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const get = store.get(client_id);
+        get.onsuccess = (e) => {
+            const item = e.target.result;
+            if (item) {
+                Object.assign(item, patch);
+                store.put(item);
+            }
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e);
+    });
+}
 
-        function tiraYukle(pId, sId) {
-            let formData = new FormData();
-            formData.append('palet_id', pId);
-            formData.append('sevkiyat_id', sId);
-            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+async function queueRemoveDone() {
+    if (!db) await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+        req.onsuccess = (e) => {
+            const items = e.target.result || [];
+            items.forEach(i => {
+                if (i.status === 'ok') store.delete(i.client_id);
+            });
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e);
+    });
+}
 
-            fetch('/inventory/api/yukle/', { 
-                method: 'POST', 
-                body: formData 
-            })
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === 'success') {
-                    alert(res.message);
-                    location.reload(); 
-                } else {
-                    alert("⚠️ Yükleme hatası: " + res.message);
-                }
-            })
-            .catch(err => alert("Yükleme sırasında teknik hata oluştu!"));
-        }
+// ---- UUID üretici ----
+function uuid() {
+    if (crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
+}
 
-        let scanner = new Html5QrcodeScanner("reader", { 
-            fps: 20, 
-            qrbox: {width: 280, height: 280},
-            rememberLastUsedCamera: true,
-            aspectRatio: 1.0
+// ---- ONLINE/OFFLINE durum ----
+function durumGuncelle() {
+    const badge = document.getElementById('online-badge');
+    if (navigator.onLine) {
+        badge.className = 'online';
+        badge.textContent = '📡 ONLINE';
+        // Bağlantı geri geldi → kuyruğu gönder
+        kuyrugaSenkronEt();
+    } else {
+        badge.className = 'offline';
+        badge.textContent = '📵 OFFLINE';
+    }
+}
+window.addEventListener('online', durumGuncelle);
+window.addEventListener('offline', durumGuncelle);
+
+async function queueRefreshUI() {
+    const all = await queueGetAll();
+    const pending = all.filter(i => i.status !== 'ok');
+    const badge = document.getElementById('sync-badge');
+    const count = document.getElementById('queue-count');
+    const section = document.getElementById('queue-section');
+    const list = document.getElementById('queue-list');
+
+    if (pending.length > 0) {
+        badge.classList.add('visible');
+        section.classList.add('visible');
+    } else {
+        badge.classList.remove('visible');
+        section.classList.remove('visible');
+    }
+    count.textContent = pending.length;
+
+    list.innerHTML = all.slice(-10).reverse().map(i => `
+        <div class="queue-item">
+            <span>${i.type}: palet #${i.palet_id} → tır #${i.sevkiyat_id}</span>
+            <span class="${i.status === 'ok' ? 'done' : i.status === 'pending' ? 'pending' : 'fail'}">
+                ${i.status === 'ok' ? '✅' : i.status === 'pending' ? '⏳' : '❌'} ${i.status}
+            </span>
+        </div>
+    `).join('');
+}
+
+// ---- Senkronizasyon — bağlantı varsa kuyruğu sunucuya gönder ----
+async function kuyrugaSenkronEt() {
+    if (!navigator.onLine) {
+        console.log('[SYNC] Offline, atlanıyor');
+        return;
+    }
+    const pending = await queueGetAll('pending');
+    if (pending.length === 0) return;
+
+    console.log(`[SYNC] ${pending.length} işlem gönderiliyor`);
+
+    try {
+        const r = await fetch('/inventory/api/offline-sync/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRF_TOKEN,
+            },
+            body: JSON.stringify({ operations: pending })
         });
-        window.scanner = scanner;
-        scanner.render(onScanSuccess);
-    </script>
+        const data = await r.json();
+
+        if (data.results) {
+            for (const res of data.results) {
+                await queueUpdate(res.client_id, {
+                    status: res.status,
+                    server_message: res.message
+                });
+            }
+            // Başarılı olanları sil
+            await queueRemoveDone();
+            await queueRefreshUI();
+        }
+    } catch (err) {
+        console.error('[SYNC] Hata:', err);
+    }
+}
+
+// ---- QR/Manuel Kod İşleyici ----
+async function kodOku(decodedText) {
+    if (html5QrcodeScanner) {
+        try { await html5QrcodeScanner.clear(); } catch (e) {}
+    }
+    const paletId = decodedText.replace(/\D/g, '');
+    if (!paletId) {
+        alert('Geçersiz kod');
+        location.reload();
+        return;
+    }
+
+    if (navigator.onLine) {
+        // Online: backend'den palet ve tır listesini getir
+        try {
+            const r = await fetch(`/inventory/api/scan-palet/${paletId}/`);
+            const data = await r.json();
+            sonucGoster(data);
+        } catch (err) {
+            console.error(err);
+            // Online ama API hatası → offline gibi davran
+            offlineKodOku(paletId);
+        }
+    } else {
+        // Offline: cache'den tır listesini getir (yoksa kullanıcıya bildir)
+        offlineKodOku(paletId);
+    }
+}
+
+function manuelKodGir() {
+    const val = document.getElementById('manual-code').value.trim();
+    if (val) kodOku(val);
+}
+
+async function offlineKodOku(paletId) {
+    const tirCache = JSON.parse(localStorage.getItem('aktif_tirlar') || '[]');
+    if (tirCache.length === 0) {
+        alert('OFFLINE: Önce ONLINE iken tır listesini çekmen gerekiyor!\n(Sayfayı 1 kez online açıp kapatmak yeterli.)');
+        location.reload();
+        return;
+    }
+    sonucGoster({
+        status: 'success',
+        palet_id: paletId,
+        palet_no: 'PLT-' + paletId,
+        kg: '?',
+        brut_kg: '?',
+        fire: '?',
+        palet_adedi: '?',
+        urun: '(offline mod)',
+        tirlar: tirCache,
+        offline: true
+    });
+}
+
+function sonucGoster(data) {
+    const resultBox = document.getElementById('result');
+    resultBox.style.display = 'block';
+
+    if (data.status === 'success') {
+        // Tır listesini cache'e al
+        if (data.tirlar && data.tirlar.length > 0 && !data.offline) {
+            localStorage.setItem('aktif_tirlar', JSON.stringify(data.tirlar));
+        }
+
+        const tirOptions = data.tirlar.length > 0
+            ? data.tirlar.map(t =>
+                `<button onclick="tiraYukle(${data.palet_id}, ${t.id})" class="btn-tir">
+                    🚛 ${t.plaka} - ${t.varis_yeri || ''}
+                 </button>`
+            ).join("")
+            : `<div style="background:#ffc107; color:#333; padding:10px; border-radius:8px;">⚠️ Aktif tır yok!</div>`;
+
+        const offlineBadge = data.offline
+            ? `<div style="background:#dc3545; color:white; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-size:12px;">📵 OFFLINE MODU - Veri sınırlı</div>`
+            : '';
+
+        resultBox.innerHTML = `
+            <div class="success-card">
+                ${offlineBadge}
+                <div class="palet-header">📦 Palet ID: #${data.palet_id}</div>
+                <div class="info-row">Ürün: <b>${data.urun}</b></div>
+                <div class="info-row">Kantar Giriş: <span style="color:#888;">${data.brut_kg} KG</span></div>
+                <div class="info-row">Yüklenecek (Net): <span class="badge">${data.kg} KG</span></div>
+                <div class="info-row">Palet Sayısı: <b style="color: #28a745;">${data.palet_adedi} Adet</b></div>
+                <div class="info-row" style="font-size: 0.9em; color: #ffc107;">İşleme Farkı: ${data.fire} KG</div>
+                <hr>
+                <p style="color:#888; font-size: 0.9em; margin-bottom:10px;">LÜTFEN HEDEF ARACI SEÇİN:</p>
+                ${tirOptions}
+                <button onclick="location.reload()" style="background:none; border:1px solid #444; color:#666; width:100%; margin-top:15px; padding:12px; border-radius:10px; font-weight:bold;">❌ İPTAL ET</button>
+            </div>
+        `;
+    } else if (data.status === 'warning') {
+        resultBox.innerHTML = `
+            <div class="success-card" style="border-left-color: #ffc107;">
+                <h3 style="color:#ffc107; margin-top:0;">⚠️ UYARI</h3>
+                <p>${data.message}</p>
+                <button onclick="location.reload()" class="btn-tir" style="background:#555;">YENİ OKUTMA YAP</button>
+            </div>
+        `;
+    } else {
+        resultBox.innerHTML = `
+            <div class="success-card" style="border-left-color: #dc3545;">
+                <h3 style="color:#dc3545; margin-top:0;">🛑 HATA</h3>
+                <p>${data.message}</p>
+                <button onclick="location.reload()" class="btn-tir" style="background:#555;">TEKRAR DENE</button>
+            </div>
+        `;
+    }
+}
+
+// ---- Tıra Yükleme ----
+async function tiraYukle(paletId, sevkiyatId) {
+    const operation = {
+        client_id: uuid(),
+        type: 'load_palet',
+        palet_id: parseInt(paletId),
+        sevkiyat_id: parseInt(sevkiyatId),
+        scanned_at: new Date().toISOString(),
+        status: 'pending',
+        created_at: Date.now()
+    };
+
+    if (navigator.onLine) {
+        // Online: doğrudan POST et
+        try {
+            const formData = new FormData();
+            formData.append('palet_id', paletId);
+            formData.append('sevkiyat_id', sevkiyatId);
+            formData.append('csrfmiddlewaretoken', CSRF_TOKEN);
+
+            const r = await fetch('/inventory/api/yukle/', {
+                method: 'POST',
+                body: formData
+            });
+            const res = await r.json();
+            if (res.status === 'success') {
+                alert(res.message);
+                location.reload();
+                return;
+            } else {
+                alert("⚠️ Yükleme hatası: " + res.message);
+                return;
+            }
+        } catch (err) {
+            console.error('[ONLINE-LOAD] Hata, kuyruğa al:', err);
+            // Devam ederek kuyruğa ekle
+        }
+    }
+
+    // Offline veya online'da hata → KUYRUĞA al
+    await queueAdd(operation);
+    await queueRefreshUI();
+    alert(`📵 OFFLINE/HATA: İşlem kuyruğa alındı.\nBağlantı geldiğinde otomatik gönderilecek.\n\nKuyruktaki: ${(await queueGetAll('pending')).length}`);
+    location.reload();
+}
+
+// ---- Service Worker kayıt ----
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('[SW] Kayıtlı:', reg.scope))
+            .catch(err => console.warn('[SW] Hata:', err));
+    });
+}
+
+// ---- Açılışta yapılacaklar ----
+document.addEventListener('DOMContentLoaded', async () => {
+    durumGuncelle();
+    await openDB();
+    await queueRefreshUI();
+    if (navigator.onLine) await kuyrugaSenkronEt();
+
+    // Tır listesini önbelleğe al (online ise)
+    if (navigator.onLine) {
+        try {
+            const r = await fetch('/inventory/api/aktif-sevkiyatlar/');
+            const data = await r.json();
+            if (data.sevkiyatlar) {
+                const tirCache = data.sevkiyatlar.map(s => ({
+                    id: s.id, plaka: s.plaka, varis_yeri: s.musteri
+                }));
+                localStorage.setItem('aktif_tirlar', JSON.stringify(tirCache));
+            }
+        } catch (e) { console.warn('Tır cache yüklenemedi:', e); }
+    }
+
+    // QR Tarayıcıyı başlat
+    html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+        fps: 15,
+        qrbox: { width: 270, height: 270 },
+        rememberLastUsedCamera: true,
+        aspectRatio: 1.0
+    });
+    html5QrcodeScanner.render(kodOku);
+});
+
+// Her 30 saniyede bir kuyruğu kontrol et (online geldiğinde sync)
+setInterval(() => {
+    if (navigator.onLine) kuyrugaSenkronEt();
+}, 30000);
+</script>
+
 </body>
 </html>

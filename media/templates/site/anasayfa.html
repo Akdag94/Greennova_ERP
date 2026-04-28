@@ -1,0 +1,574 @@
+{% extends 'site/base.html' %}
+
+{% block title %}GreenNova — Patron Paneli{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =============================================
+   PATRON PANELİ — Sade, Net, Anlaşılır
+   Developer: Azat Akdag | ID: 76a253b5
+   ============================================= */
+:root {
+    --g: #28a745; --gd: #1e7e34; --gl: #e8f5ec;
+    --r: #dc3545; --b: #007bff; --o: #fd7e14;
+    --y: #ffc107; --t: #20c997;
+    --bg: #f4f6f9; --card: #fff;
+    --txt: #1a1a2e; --muted: #6c757d;
+    --border: #dee2e6;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+body { background: var(--bg); }
+
+/* NAV override */
+nav { padding: 10px 20px; }
+
+/* HERO */
+.hero-bar {
+    background: linear-gradient(135deg, #0d1f0f 0%, #1a4d23 50%, #28a745 100%);
+    color: white; padding: 24px 28px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+}
+.hero-bar h1 { font-size: 22px; font-weight: 800; margin: 0; }
+.hero-bar .sub { font-size: 13px; opacity: 0.75; margin-top: 3px; }
+.hero-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.hbtn {
+    padding: 8px 16px; border-radius: 8px; font-size: 13px;
+    font-weight: 700; cursor: pointer; border: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none;
+}
+.hbtn-white { background: white; color: var(--gd); }
+.hbtn-outline { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.4); }
+
+/* WRAPPER */
+.pw { max-width: 1320px; margin: 0 auto; padding: 20px 16px; }
+
+/* ÖNEMLİ MESAJ BANDI (varsa negatif durum) */
+.alert-band {
+    background: #fff3cd; border-left: 4px solid var(--y);
+    padding: 10px 16px; border-radius: 8px; margin-bottom: 16px;
+    font-size: 13px; display: flex; align-items: center; gap: 8px;
+}
+
+/* KART SISTEMİ */
+.card {
+    background: var(--card); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+.card-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px;
+    color: var(--muted); font-weight: 700; margin-bottom: 6px;
+}
+.card-value {
+    font-size: 28px; font-weight: 800; color: var(--txt);
+    letter-spacing: -0.5px; line-height: 1;
+}
+.card-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.card-icon {
+    float: right; font-size: 28px; opacity: 0.15; margin-top: -4px;
+}
+
+/* GRID */
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.g2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.g1-3 { display: grid; grid-template-columns: 1fr 2fr; gap: 14px; }
+
+/* BÖLÜM BAŞLIĞI */
+.sekh {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 22px 0 10px;
+}
+.sekh h2 {
+    font-size: 15px; font-weight: 800; color: var(--txt);
+    margin: 0; display: flex; align-items: center; gap: 8px;
+}
+.sekh a { font-size: 12px; color: var(--g); font-weight: 600; }
+
+/* RENK VURGULAR */
+.c-green { color: var(--g) !important; }
+.c-red { color: var(--r) !important; }
+.c-blue { color: var(--b) !important; }
+.c-orange { color: var(--o) !important; }
+.c-muted { color: var(--muted) !important; }
+
+/* DURUM ETIKETI */
+.etk {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+}
+.etk-green { background: var(--gl); color: var(--gd); }
+.etk-red { background: #fdecea; color: var(--r); }
+.etk-blue { background: #e3f0ff; color: var(--b); }
+.etk-orange { background: #fff3e0; color: var(--o); }
+.etk-gray { background: #f0f0f0; color: var(--muted); }
+
+/* LİSTE */
+.slist { list-style: none; padding: 0; margin: 0; }
+.slist li {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.slist li:last-child { border-bottom: 0; }
+.slist .name { font-weight: 600; color: var(--txt); }
+.slist .val { font-weight: 700; color: var(--b); }
+.slist .val.red { color: var(--r); }
+
+/* PROGRESS BAR */
+.prog-wrap { margin-top: 8px; }
+.prog-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-bottom: 3px;
+}
+.prog-bar { height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+/* GRAFİK */
+.chart-wrap {
+    position: relative; height: 180px; margin-top: 8px;
+}
+
+/* TIR KARTI */
+.tir-kart {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.tir-kart:last-child { border-bottom: 0; }
+.tir-plaka {
+    font-weight: 800; font-size: 14px; color: var(--txt);
+    background: #f0f0f0; padding: 2px 8px; border-radius: 4px;
+}
+.tir-musteri { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* HIZLI AKSIYONLAR */
+.aksiyonlar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px; margin-top: 8px;
+}
+.ak-btn {
+    background: white; border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 10px;
+    text-align: center; text-decoration: none;
+    transition: all 0.15s; cursor: pointer;
+}
+.ak-btn:hover {
+    border-color: var(--g); background: var(--gl);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.15);
+}
+.ak-btn .ak-icon { font-size: 22px; display: block; margin-bottom: 5px; }
+.ak-btn .ak-label { font-size: 11px; font-weight: 700; color: var(--txt); }
+
+/* RESPONSIVE */
+@media (max-width: 900px) { .g4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) {
+    .g4, .g3, .g2, .g1-3 { grid-template-columns: 1fr; }
+    .hero-bar h1 { font-size: 17px; }
+    .card-value { font-size: 22px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO BAR -->
+<div class="hero-bar">
+    <div>
+        <h1>📊 GreenNova ERP — Patron Paneli</h1>
+        <div class="sub">{{ bugun|date:"d F Y, l" }} — Tüm verilerin anlık özeti</div>
+    </div>
+    <div class="hero-btns">
+        <a href="/admin/" class="hbtn hbtn-white">⚙️ Yönetim Paneli</a>
+        <a href="/inventory/scan/" class="hbtn hbtn-outline">📱 QR Terminal</a>
+        <a href="/site/yardim/" class="hbtn hbtn-outline">❓ Rehber</a>
+    </div>
+</div>
+
+<div class="pw">
+
+{% if aktif_tir_sayisi == 0 %}
+<div class="alert-band">
+    ⚠️ Şu an aktif tır yok. Yeni bir sevkiyat oluşturmak için
+    <a href="/admin/finance/sevkiyat/add/" style="color:#856404; font-weight:700; margin-left:4px;">buraya tıkla →</a>
+</div>
+{% endif %}
+
+<!-- ====================================================
+     BÖLÜM 1: ANA RAKAMLLAR (4 büyük kart)
+     ==================================================== -->
+<div class="g4">
+
+    <div class="card">
+        <div class="card-icon">💰</div>
+        <div class="card-title">Bu Ay Satış</div>
+        <div class="card-value c-green">{{ bu_ay_satis }} ₺</div>
+        <div class="card-sub">
+            Bu hafta: <b>{{ bu_hafta_satis }} ₺</b>
+            {% if satis_degisim > 0 %}
+                <span class="etk etk-green" style="margin-left:4px;">▲ %{{ satis_degisim }}</span>
+            {% elif satis_degisim < 0 %}
+                <span class="etk etk-red" style="margin-left:4px;">▼ %{{ satis_degisim|floatformat:1 }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">🚚</div>
+        <div class="card-title">Yoldaki Tırlar</div>
+        <div class="card-value c-blue">{{ aktif_tir_sayisi }}</div>
+        <div class="card-sub">Şu an sevkiyatta olan araç sayısı</div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Depodaki Stok</div>
+        <div class="card-value">{{ toplam_stok_kg }} KG</div>
+        <div class="card-sub">{{ toplam_stok_palet }} palet · Maliyet: {{ stok_maliyet }} ₺</div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">📈</div>
+        <div class="card-title">Net Kâr (Toplam)</div>
+        <div class="card-value {% if net_kar_pozitif %}c-green{% else %}c-red{% endif %}">
+            {{ net_kar }} ₺
+        </div>
+        <div class="card-sub">
+            Bu ay: <b>{{ bu_ay_kar }} ₺</b>
+        </div>
+    </div>
+
+</div>
+
+<!-- ====================================================
+     BÖLÜM 2: ALACAK / BORÇ (para akışı)
+     ==================================================== -->
+<div class="sekh">
+    <h2>💳 Para Akışı</h2>
+</div>
+
+<div class="g4">
+
+    <div class="card">
+        <div class="card-icon">🏦</div>
+        <div class="card-title">Müşterilerden Alacağımız</div>
+        <div class="card-value c-blue">{{ toplam_musteri_alacak }} ₺</div>
+        <div class="card-sub">{{ toplam_musteri }} aktif müşteri</div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">⏳</div>
+        <div class="card-title">Bekleyen (Ödenmemiş)</div>
+        <div class="card-value c-orange">{{ bekleyen_alacak }} ₺</div>
+        <div class="card-sub">Müşterilerden henüz tahsil edilmeyen</div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">🌾</div>
+        <div class="card-title">Müstahsillere Borcumuz</div>
+        <div class="card-value c-red">{{ toplam_mustahsil_borc }} ₺</div>
+        <div class="card-sub">{{ toplam_mustahsil }} üretici / tedarikçi</div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">📉</div>
+        <div class="card-title">Bu Ay Giderler</div>
+        <div class="card-value c-red">{{ bu_ay_gider }} ₺</div>
+        <div class="card-sub">Toplam geçmiş gider: {{ toplam_gider }} ₺</div>
+    </div>
+
+</div>
+
+<!-- ====================================================
+     BÖLÜM 3: DETAY TABLOLAR (2 kolon)
+     ==================================================== -->
+<div class="sekh">
+    <h2>🔍 Detay Görünüm</h2>
+</div>
+
+<div class="g2" style="align-items:start;">
+
+    <!-- Müşteri borçları -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">🏪 En Fazla Alacaklı Müşteriler</div>
+        {% if en_cok_borc_musteri %}
+        <ul class="slist">
+            {% for m in en_cok_borc_musteri %}
+            <li>
+                <span class="name">{{ m.unvan }}</span>
+                <span class="val red">{{ m.toplam_alacagimiz|floatformat:0 }} ₺</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="c-muted" style="font-size:13px; text-align:center; padding:16px 0;">
+            ✅ Tüm müşteri hesapları kapalı
+        </p>
+        {% endif %}
+        <div style="margin-top:10px;">
+            <a href="/admin/finance/musteri/" style="font-size:12px; color:var(--g); font-weight:600;">
+                Tüm müşterileri gör →
+            </a>
+        </div>
+    </div>
+
+    <!-- Müstahsil borçları -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">👨‍🌾 En Fazla Borçlu Olduğumuz Müstahsiller</div>
+        {% if en_cok_borc_mustahsil %}
+        <ul class="slist">
+            {% for m in en_cok_borc_mustahsil %}
+            <li>
+                <span class="name">{{ m.ad_soyad }}</span>
+                <span class="val" style="color:var(--o);">{{ m.toplam_borc|floatformat:0 }} ₺</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="c-muted" style="font-size:13px; text-align:center; padding:16px 0;">
+            ✅ Tüm müstahsil borçları ödenmiş
+        </p>
+        {% endif %}
+        <div style="margin-top:10px;">
+            <a href="/admin/finance/mustahsil/" style="font-size:12px; color:var(--g); font-weight:600;">
+                Tüm müstahsilleri gör →
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- ====================================================
+     BÖLÜM 4: AKTİF TIRLAR + ÜRÜN STOĞU
+     ==================================================== -->
+<div class="g2" style="margin-top:14px; align-items:start;">
+
+    <!-- Aktif Tırlar -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">🚛 Yoldaki Tırlar</div>
+        {% if aktif_tir_detay %}
+            {% for item in aktif_tir_detay %}
+            <div class="tir-kart">
+                <div>
+                    <span class="tir-plaka">{{ item.tir.plaka }}</span>
+                    <div class="tir-musteri">
+                        {{ item.tir.musteri.unvan|default:"Müşteri Yok" }}
+                        · {{ item.tir.cikis_tarihi|date:"d.m H:i" }}
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:700; color:var(--b); font-size:13px;">
+                        {{ item.kg|floatformat:0 }} KG
+                    </div>
+                    <div style="font-size:11px; color:var(--muted);">
+                        {{ item.palet_adet }} palet
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="c-muted" style="font-size:13px; text-align:center; padding:20px 0;">
+                Şu an yolda aktif tır yok
+            </p>
+        {% endif %}
+        <div style="margin-top:10px;">
+            <a href="/admin/finance/sevkiyat/" style="font-size:12px; color:var(--g); font-weight:600;">
+                Tüm sevkiyatları gör →
+            </a>
+            &nbsp;|&nbsp;
+            <a href="/admin/finance/sevkiyat/add/" style="font-size:12px; color:var(--b); font-weight:600;">
+                + Yeni tır oluştur
+            </a>
+        </div>
+    </div>
+
+    <!-- Ürün stoğu -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">📦 Depodaki Ürünler</div>
+        {% if urun_stok %}
+            {% for u in urun_stok %}
+            <div class="prog-wrap">
+                <div class="prog-label">
+                    <span>{{ u.urun_cinsi__ad|default:"Bilinmiyor" }}</span>
+                    <span style="font-weight:700;">{{ u.kg|floatformat:0 }} KG · {{ u.palet }} palet</span>
+                </div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:{{ u.palet|floatformat:0 }}%; background:var(--g); max-width:100%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="c-muted" style="font-size:13px; text-align:center; padding:20px 0;">
+                Depoda stok bulunmuyor
+            </p>
+        {% endif %}
+        <div style="margin-top:12px;">
+            <a href="/admin/inventory/palet/" style="font-size:12px; color:var(--g); font-weight:600;">
+                Tüm paletleri gör →
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- ====================================================
+     BÖLÜM 5: GRAFİK — Son 7 gün
+     ==================================================== -->
+<div class="sekh">
+    <h2>📈 Son 7 Gün Satış Performansı</h2>
+</div>
+
+<div class="card">
+    <div class="chart-wrap">
+        <canvas id="salesChart"></canvas>
+    </div>
+</div>
+
+<!-- ====================================================
+     BÖLÜM 6: DEPO DOLULUK
+     ==================================================== -->
+{% if depolar %}
+<div class="sekh">
+    <h2>🏭 Depo Odaları Doluluk Durumu</h2>
+    <a href="/admin/inventory/depo/">Tüm depolar →</a>
+</div>
+
+<div class="g3">
+    {% for d in depolar %}
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-weight:700; font-size:14px;">{{ d.ad }}</div>
+            <span class="etk {% if d.doluluk_orani > 90 %}etk-red{% elif d.doluluk_orani > 70 %}etk-orange{% else %}etk-green{% endif %}">
+                %{{ d.doluluk_orani }}
+            </span>
+        </div>
+        <div class="prog-bar">
+            <div class="prog-fill" style="width:{{ d.doluluk_orani }}%;
+                background: {% if d.doluluk_orani > 90 %}var(--r){% elif d.doluluk_orani > 70 %}var(--o){% else %}var(--g){% endif %};"></div>
+        </div>
+        <div style="font-size:11px; color:var(--muted); margin-top:6px;">
+            {{ d.mevcut_palet_sayisi }} / {{ d.kapasite_palet }} palet
+            {% if d.sicaklik %}· {{ d.sicaklik }}{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ====================================================
+     BÖLÜM 7: HIZLI AKSIYONLAR
+     ==================================================== -->
+<div class="sekh">
+    <h2>⚡ Hızlı İşlemler</h2>
+</div>
+
+<div class="aksiyonlar">
+    <a href="/admin/inventory/palet/add/" class="ak-btn">
+        <span class="ak-icon">⚖️</span>
+        <span class="ak-label">Kantar Girişi</span>
+    </a>
+    <a href="/admin/finance/sevkiyat/add/" class="ak-btn">
+        <span class="ak-icon">🚛</span>
+        <span class="ak-label">Yeni Tır</span>
+    </a>
+    <a href="/inventory/scan/" class="ak-btn">
+        <span class="ak-icon">📱</span>
+        <span class="ak-label">QR Terminal</span>
+    </a>
+    <a href="/admin/finance/carihareket/add/" class="ak-btn">
+        <span class="ak-icon">💸</span>
+        <span class="ak-label">Müstahsil Öde</span>
+    </a>
+    <a href="/admin/finance/musterihareket/add/" class="ak-btn">
+        <span class="ak-icon">💰</span>
+        <span class="ak-label">Tahsilat Al</span>
+    </a>
+    <a href="/admin/finance/gider/add/" class="ak-btn">
+        <span class="ak-icon">🧾</span>
+        <span class="ak-label">Gider Gir</span>
+    </a>
+    <a href="/inventory/mobil-giris/" class="ak-btn">
+        <span class="ak-icon">📸</span>
+        <span class="ak-label">Mobil Kabul</span>
+    </a>
+    <a href="/site/yardim/" class="ak-btn">
+        <span class="ak-icon">❓</span>
+        <span class="ak-label">Nasıl Kullanılır</span>
+    </a>
+</div>
+
+</div>{# end .pw #}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Gizli imza: 76a253b51f848f43 | AA-GreennovaERP-2026
+const salesCtx = document.getElementById('salesChart').getContext('2d');
+new Chart(salesCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ grafik_gunler|safe }},
+        datasets: [
+            {
+                label: 'Satış (₺)',
+                data: {{ grafik_satis|safe }},
+                backgroundColor: 'rgba(40,167,69,0.85)',
+                borderRadius: 6,
+                yAxisID: 'y1',
+            },
+            {
+                label: 'KG',
+                data: {{ grafik_kg|safe }},
+                type: 'line',
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.1)',
+                borderWidth: 2.5,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y2',
+            }
+        ]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { position: 'top', labels: { font: { size: 12 } } },
+            tooltip: {
+                backgroundColor: '#1a1a2e',
+                callbacks: {
+                    label: ctx => ctx.dataset.label === 'Satış (₺)'
+                        ? `Satış: ${ctx.parsed.y.toLocaleString('tr-TR')} ₺`
+                        : `KG: ${ctx.parsed.y.toLocaleString('tr-TR')} KG`
+                }
+            }
+        },
+        scales: {
+            y1: {
+                type: 'linear', position: 'left',
+                grid: { color: 'rgba(0,0,0,0.04)' },
+                ticks: {
+                    callback: v => v.toLocaleString('tr-TR') + ' ₺',
+                    font: { size: 10 }
+                }
+            },
+            y2: {
+                type: 'linear', position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: {
+                    callback: v => v.toLocaleString('tr-TR') + ' KG',
+                    font: { size: 10 }
+                }
+            },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+    }
+});
+</script>
+{% endblock %}

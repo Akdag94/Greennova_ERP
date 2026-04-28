@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: A4;
+        margin: 1.5cm 1.8cm 2cm 1.8cm;
+        @frame footer_frame {
+            -pdf-frame-content: footer_content;
+            bottom: 0.8cm; left: 1.8cm; right: 1.8cm; height: 1cm;
+        }
+    }
+
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 10pt;
+        color: #1a1a1a;
+        line-height: 1.4;
+    }
+
+    /* === HEADER === */
+    .page-header {
+        width: 100%;
+        border-bottom: 2.5pt solid #28a745;
+        padding-bottom: 10pt;
+        margin-bottom: 12pt;
+    }
+    .header-table { width: 100%; }
+    .header-logo { width: 90pt; vertical-align: middle; }
+    .header-logo img { max-height: 60pt; max-width: 80pt; }
+    .header-company { vertical-align: middle; padding-left: 10pt; }
+    .header-company .firm-name {
+        font-size: 14pt; font-weight: bold; color: #28a745;
+        letter-spacing: 0.5pt;
+    }
+    .header-company .firm-sub { font-size: 8pt; color: #555; margin-top: 2pt; }
+    .header-belge { text-align: right; vertical-align: top; }
+    .header-belge .belge-tipi {
+        font-size: 13pt; font-weight: bold; color: #1a1a1a;
+        text-transform: uppercase; letter-spacing: 0.5pt;
+    }
+    .header-belge .belge-no { font-size: 9pt; color: #666; margin-top: 3pt; }
+    .header-belge .belge-tarih { font-size: 9pt; color: #333; margin-top: 2pt; }
+
+    /* === TARAFLAR KUTUSU === */
+    .taraflar-table { width: 100%; margin-bottom: 14pt; }
+    .taraf-kutu {
+        border: 1pt solid #d0d0d0;
+        border-radius: 4pt;
+        padding: 8pt 10pt;
+        vertical-align: top;
+        width: 48%;
+    }
+    .taraf-bosluk { width: 4%; }
+    .taraf-baslik {
+        font-size: 7.5pt; text-transform: uppercase;
+        letter-spacing: 0.8pt; color: #28a745;
+        font-weight: bold; margin-bottom: 4pt;
+        border-bottom: 0.5pt solid #d0d0d0; padding-bottom: 3pt;
+    }
+    .taraf-ad { font-size: 11pt; font-weight: bold; margin-bottom: 3pt; }
+    .taraf-detay { font-size: 8.5pt; color: #444; line-height: 1.5; }
+
+    /* === TABLO === */
+    .veri-tablo {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12pt;
+    }
+    .veri-tablo thead tr {
+        background-color: #28a745;
+        color: white;
+    }
+    .veri-tablo thead th {
+        padding: 6pt 8pt;
+        text-align: left;
+        font-size: 8.5pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.3pt;
+    }
+    .veri-tablo thead th.right { text-align: right; }
+    .veri-tablo tbody tr:nth-child(even) { background-color: #f8fdf8; }
+    .veri-tablo tbody td {
+        padding: 5pt 8pt;
+        border-bottom: 0.5pt solid #e0e0e0;
+        font-size: 9pt;
+        vertical-align: middle;
+    }
+    .veri-tablo tbody td.right { text-align: right; }
+    .veri-tablo tfoot td {
+        padding: 6pt 8pt;
+        font-weight: bold;
+        font-size: 9.5pt;
+        border-top: 1.5pt solid #28a745;
+    }
+    .veri-tablo tfoot td.right { text-align: right; }
+
+    /* === TOPLAM KUTU === */
+    .toplam-bolge {
+        float: right;
+        width: 220pt;
+        margin-bottom: 16pt;
+    }
+    .toplam-satir {
+        padding: 4pt 8pt;
+        border-bottom: 0.5pt solid #e0e0e0;
+        font-size: 9.5pt;
+    }
+    .toplam-satir.son {
+        background-color: #28a745;
+        color: white;
+        font-weight: bold;
+        font-size: 11pt;
+        border-radius: 3pt;
+        padding: 6pt 8pt;
+    }
+    .toplam-satir td { padding: 0; }
+    .toplam-label { text-align: left; }
+    .toplam-deger { text-align: right; font-weight: bold; }
+
+    /* === NOT KUTUSU === */
+    .not-kutu {
+        border: 1pt solid #d0d0d0;
+        border-left: 3pt solid #28a745;
+        padding: 7pt 10pt;
+        font-size: 8.5pt;
+        color: #444;
+        margin-top: 8pt;
+        background: #f9fef9;
+    }
+    .not-kutu .not-baslik { font-weight: bold; color: #28a745; margin-bottom: 3pt; }
+
+    /* === İMZA ALANI === */
+    .imza-table {
+        width: 100%;
+        margin-top: 24pt;
+    }
+    .imza-kutu {
+        text-align: center;
+        vertical-align: bottom;
+        width: 33%;
+        padding: 0 8pt;
+    }
+    .imza-cizgi {
+        border-top: 1pt solid #999;
+        margin-bottom: 4pt;
+        margin-top: 30pt;
+    }
+    .imza-label { font-size: 8pt; color: #555; }
+
+    /* === FOOTER === */
+    #footer_content {
+        text-align: center;
+        font-size: 7.5pt;
+        color: #888;
+        border-top: 0.5pt solid #d0d0d0;
+        padding-top: 4pt;
+    }
+
+    /* === RENK YARDIMCILARI === */
+    .text-green { color: #28a745; }
+    .text-red { color: #dc3545; }
+    .text-blue { color: #007bff; }
+    .text-muted { color: #666; }
+    .bold { font-weight: bold; }
+
+    /* === DAMGA/DURUM === */
+    .durum-damga {
+        position: absolute;
+        top: 120pt; right: 30pt;
+        border: 3pt solid #28a745;
+        color: #28a745;
+        font-size: 20pt;
+        font-weight: bold;
+        padding: 4pt 10pt;
+        transform: rotate(-15deg);
+        opacity: 0.2;
+        text-transform: uppercase;
+    }
+</style>
+</head>
+<body>
+
+{% block header %}
+<div class="page-header">
+    <table class="header-table">
+        <tr>
+            <td class="header-logo">
+                {% if logo_base64 %}
+                    <img src="{{ logo_base64 }}" alt="Logo">
+                {% endif %}
+            </td>
+            <td class="header-company">
+                <div class="firm-name">{{ COMPANY_NAME|upper }}</div>
+                <div class="firm-sub">
+                    {{ COMPANY_ADDRESS }}<br>
+                    {% if COMPANY_PHONE %}Tel: {{ COMPANY_PHONE }}{% endif %}
+                    {% if COMPANY_VERGI_NO %} | VN: {{ COMPANY_VERGI_NO }} / {{ COMPANY_VERGI_DAIRESI }}{% endif %}
+                </div>
+            </td>
+            <td class="header-belge">
+                <div class="belge-tipi">{% block belge_tipi %}BELGE{% endblock %}</div>
+                <div class="belge-no">{% block belge_no %}{% endblock %}</div>
+                <div class="belge-tarih">Tarih: {{ bugun|date:"d.m.Y" }}</div>
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+<div id="footer_content">
+    {{ COMPANY_NAME }} | {{ COMPANY_ADDRESS }}
+    {% if COMPANY_VERGI_NO %} | Vergi No: {{ COMPANY_VERGI_NO }}{% endif %}
+     | Bu belge GreenNova ERP sistemi tarafından {{ bugun|date:"d.m.Y" }} tarihinde oluşturulmuştur.
+</div>
+
+</body>
+</html>

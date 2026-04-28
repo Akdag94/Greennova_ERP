@@ -1,0 +1,100 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}{{ baslik }}{% endblock %}
+{% block belge_no %}No: {{ belge_no }}{% endblock %}
+
+{% block content %}
+
+<!-- TARAFLAR -->
+<table class="taraflar-table">
+    <tr>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Düzenleyen</div>
+            <div class="taraf-ad">{{ COMPANY_NAME }}</div>
+            <div class="taraf-detay">
+                {{ COMPANY_ADDRESS }}<br>
+                {% if COMPANY_PHONE %}Tel: {{ COMPANY_PHONE }}<br>{% endif %}
+                {% if COMPANY_VERGI_NO %}Vergi No: {{ COMPANY_VERGI_NO }} / {{ COMPANY_VERGI_DAIRESI }}{% endif %}
+            </div>
+        </td>
+        <td class="taraf-bosluk"></td>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Üretici / Müstahsil</div>
+            <div class="taraf-ad">{{ mustahsil.ad_soyad|upper }}</div>
+            <div class="taraf-detay">
+                Bölge: {{ mustahsil.bolge }}<br>
+                {% if mustahsil.telefon %}Tel: {{ mustahsil.telefon }}<br>{% endif %}
+                {% if mustahsil.tc_no %}TC No: {{ mustahsil.tc_no }}{% endif %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- İŞLEM DETAYI -->
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>İşlem Türü</th>
+            <th>Açıklama</th>
+            <th class="right">Tutar</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ hareket.tarih|date:"d.m.Y" }}</td>
+            <td><b>{{ hareket.get_islem_tipi_display }}</b></td>
+            <td>{{ hareket.aciklama|default:"—" }}</td>
+            <td class="right"><b>{{ hareket.miktar|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="right">TOPLAM TUTAR:</td>
+            <td class="right text-green">{{ hareket.miktar|floatformat:2 }} ₺</td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- MEVCUT BAKİYE -->
+<table class="veri-tablo" style="width:50%; float:right;">
+    <thead>
+        <tr>
+            <th colspan="2">Güncel Cari Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Toplam Borcumuz:</td>
+            <td class="right"><b>{{ mustahsil.toplam_borc|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tbody>
+</table>
+<div style="clear:both;"></div>
+
+<!-- NOT -->
+<div class="not-kutu" style="margin-top:20pt;">
+    <div class="not-baslik">📋 ÖNEMLİ NOT</div>
+    Bu makbuz, GreenNova Tarım sisteminde kayıtlı işlem belgesidir.
+    İtiraz ve sorularınız için lütfen şirketimizle iletişime geçiniz.
+</div>
+
+<!-- İMZA -->
+<table class="imza-table">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Teslim Alan<br>{{ mustahsil.ad_soyad }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Muhasebe Yetkilisi<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Onay / Kaşe<br>{{ COMPANY_NAME }}</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

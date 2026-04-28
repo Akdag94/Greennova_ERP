@@ -90,37 +90,18 @@ class UrunKategorisiAdmin(ImportExportModelAdmin):
 # --- 5. PALET ADMİN ---
 @admin.register(Palet)
 class PaletAdmin(ImportExportModelAdmin):
-    list_display = ('palet_no_goster', 'urun_cinsi', 'foto_onizleme', 'toplam_palet_adedi', 'brut_net_goster', 'isleme_farki_gosterge', 'durum_gosterge', 'qr_kod_onizleme')
+    list_display = ('palet_no', 'urun_cinsi', 'foto_onizleme', 'toplam_palet_adedi', 'brut_miktar_kg', 'miktar_kg', 'isleme_farki_gosterge', 'durum_gosterge', 'qr_kod_onizleme')
     list_filter = (StokDurumuFiltresi, 'durum', 'depo_konumu', 'urun_cinsi')
     search_fields = ('palet_no', 'mustahsil__ad_soyad')
-    readonly_fields = ('qr_kod_onizleme', 'foto_onizleme', 'fire_miktar_kg')
+    readonly_fields = ('qr_kod_onizleme', 'foto_onizleme', 'fire_miktar_kg') 
     autocomplete_fields = ['mustahsil', 'depo_konumu', 'urun_cinsi']
     actions = [toplu_sevkiyata_yukle]
-
+    
     fields = (
-        'urun_cinsi', 'mustahsil', 'depo_konumu',
-        'brut_miktar_kg', 'miktar_kg', 'toplam_palet_adedi',
+        'urun_cinsi', 'mustahsil', 'depo_konumu', 
+        'brut_miktar_kg', 'miktar_kg', 'toplam_palet_adedi', 
         'birim_fiyat', 'palet_no', 'sevkiyat', 'durum', 'urun_fotografi'
     )
-
-    def palet_no_goster(self, obj):
-        """Palet no'yu taşmadan, monospace kutuda göster."""
-        return format_html(
-            '<span style="font-family:monospace;font-size:12px;'
-            'background:#f0f0f0;padding:2px 7px;border-radius:4px;'
-            'white-space:nowrap;display:inline-block;">{}</span>',
-            obj.palet_no or '—'
-        )
-    palet_no_goster.short_description = "Palet No"
-
-    def brut_net_goster(self, obj):
-        return format_html(
-            '<span style="font-size:12px;white-space:nowrap;">'
-            '<b>{} KG</b> <span style="color:#888;">/ {}</span></span>',
-            obj.miktar_kg or '—',
-            f'brüt {obj.brut_miktar_kg} KG' if obj.brut_miktar_kg else '—'
-        )
-    brut_net_goster.short_description = "Net / Brüt"
 
     def isleme_farki_gosterge(self, obj):
         return format_html('<b style="color: #666;">{} KG</b>', obj.fire_miktar_kg)

@@ -1,0 +1,140 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}SATIŞ İRSALİYESİ{% endblock %}
+{% block belge_no %}No: {{ belge_no }}{% endblock %}
+
+{% block content %}
+
+<!-- TARAFLAR -->
+<table class="taraflar-table">
+    <tr>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Satıcı</div>
+            <div class="taraf-ad">{{ COMPANY_NAME }}</div>
+            <div class="taraf-detay">
+                {{ COMPANY_ADDRESS }}<br>
+                {% if COMPANY_PHONE %}Tel: {{ COMPANY_PHONE }}<br>{% endif %}
+                {% if COMPANY_VERGI_NO %}Vergi No: {{ COMPANY_VERGI_NO }} / {{ COMPANY_VERGI_DAIRESI }}{% endif %}
+            </div>
+        </td>
+        <td class="taraf-bosluk"></td>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Alıcı / Müşteri</div>
+            <div class="taraf-ad">{{ musteri.unvan|upper }}</div>
+            <div class="taraf-detay">
+                {% if musteri.bolge %}{{ musteri.bolge }}<br>{% endif %}
+                {% if musteri.telefon %}Tel: {{ musteri.telefon }}{% endif %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- SEVKİYAT BİLGİLERİ -->
+<table class="veri-tablo" style="margin-bottom:10pt;">
+    <thead>
+        <tr>
+            <th colspan="4">Sevkiyat Bilgileri</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><b>Plaka:</b> {{ sevkiyat.plaka }}</td>
+            <td><b>Şoför:</b> {{ sevkiyat.sofor_ad }}</td>
+            <td><b>Çıkış:</b> {{ sevkiyat.cikis_tarihi|date:"d.m.Y H:i" }}</td>
+            <td><b>Durum:</b>
+                {% if sevkiyat.tamamlandi %}
+                    <span class="text-green bold">✓ TESLİM EDİLDİ</span>
+                {% else %}
+                    <span class="text-blue">⏳ Yolda</span>
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- PALET LİSTESİ -->
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th style="width:80pt;">Palet No</th>
+            <th>Ürün</th>
+            <th class="right">Brüt KG</th>
+            <th class="right">Net KG</th>
+            <th class="right">Palet Adedi</th>
+            <th class="right">Birim Fiyat</th>
+            <th class="right">Tutar (₺)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for palet in paletler %}
+        <tr>
+            <td style="font-size:8pt;">{{ palet.palet_no }}</td>
+            <td>{{ palet.urun_cinsi.ad }}</td>
+            <td class="right">{{ palet.brut_miktar_kg|floatformat:2 }}</td>
+            <td class="right">{{ palet.miktar_kg|floatformat:2 }}</td>
+            <td class="right">{{ palet.toplam_palet_adedi }}</td>
+            <td class="right">{{ sevkiyat.satis_birim_fiyat|floatformat:2 }}</td>
+            <td class="right">
+                {% if palet.miktar_kg and sevkiyat.satis_birim_fiyat %}
+                    {{ palet.miktar_kg|floatformat:2 }}
+                {% else %}—{% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="text-align:center; color:#888; padding:10pt;">Palet kaydı yok.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="right"><b>TOPLAM NET:</b></td>
+            <td class="right"><b>{{ toplam_kg|floatformat:2 }} KG</b></td>
+            <td colspan="2" class="right"><b>TOPLAM TUTAR:</b></td>
+            <td class="right text-green"><b>{{ toplam_tutar|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- ÖDEME DURUMU -->
+<table class="veri-tablo" style="width:50%; float:right; margin-top:6pt;">
+    <thead><tr><th colspan="2">Ödeme Durumu</th></tr></thead>
+    <tbody>
+        <tr>
+            <td>Satış Tutarı:</td>
+            <td class="right"><b>{{ toplam_tutar|floatformat:2 }} ₺</b></td>
+        </tr>
+        <tr>
+            <td>Müşteri Güncel Alacağımız:</td>
+            <td class="right"><b>{{ musteri.toplam_alacagimiz|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tbody>
+</table>
+<div style="clear:both;"></div>
+
+<!-- NOT -->
+<div class="not-kutu" style="margin-top:10pt;">
+    <div class="not-baslik">Ödeme Koşulları</div>
+    Mal teslimatına ilişkin oluşan bu belge, taraflar arasında mutabık kalınan şartlar dahilinde düzenlenmiştir.
+    Mal miktarı ve fiyat konusunda itiraz süresi 3 iş günüdür.
+</div>
+
+<!-- İMZA -->
+<table class="imza-table">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Teslim Eden<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Teslim Alan<br>{{ musteri.unvan }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Onay / Kaşe<br>{{ COMPANY_NAME }}</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

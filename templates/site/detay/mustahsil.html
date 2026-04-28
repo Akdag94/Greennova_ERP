@@ -1,0 +1,127 @@
+{% extends 'site/base.html' %}
+{% block title %}{{ mustahsil.ad_soyad }} — Cari Detay{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{--g:#28a745;--r:#c0392b;--o:#d35400;}
+.pw{max-width:900px;margin:0 auto;padding:20px 16px;}
+.detay-header{background:linear-gradient(135deg,#1a0a00,#7d2700);color:white;padding:24px 28px;border-radius:12px;margin-bottom:20px;}
+.detay-header h1{font-size:20px;font-weight:800;margin:0 0 6px;}
+.detay-header .sub{opacity:.75;font-size:13px;}
+.ozet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.ozet-kart{background:white;border-radius:10px;padding:16px;border:1px solid #dee2e6;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.ozet-kart .lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:700;}
+.ozet-kart .val{font-size:22px;font-weight:800;}
+.val-kirmizi{color:#c0392b;}.val-yesil{color:#155724;}.val-mavi{color:#0056b3;}
+.tablo-kart{background:white;border-radius:10px;border:1px solid #dee2e6;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.tablo-baslik{padding:14px 18px;font-weight:800;font-size:14px;border-bottom:1px solid #dee2e6;display:flex;justify-content:space-between;align-items:center;}
+table{width:100%;border-collapse:collapse;}
+th{background:#f8f9fa;padding:9px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;}
+td{padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:13px;vertical-align:middle;}
+tr:last-child td{border-bottom:0;}tr:hover td{background:#f8f9fa;}
+.etk{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.etk-turuncu{background:#fff3cd;color:#856404;}
+.etk-yesil{background:#d4edda;color:#155724;}
+@media(max-width:600px){.ozet-grid{grid-template-columns:1fr 1fr;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pw">
+
+    <a href="/" style="display:inline-flex;align-items:center;gap:6px;color:#666;font-size:13px;margin-bottom:14px;text-decoration:none;">
+        ← Ana Sayfaya Dön
+    </a>
+
+    <div class="detay-header">
+        <h1>👨‍🌾 {{ mustahsil.ad_soyad }}</h1>
+        <div class="sub">
+            {{ mustahsil.bolge }}
+            {% if mustahsil.telefon %} · {{ mustahsil.telefon }}{% endif %}
+            {% if mustahsil.tc_no %} · TC: {{ mustahsil.tc_no }}{% endif %}
+        </div>
+    </div>
+
+    <div class="ozet-grid">
+        <div class="ozet-kart">
+            <div class="lbl">Toplam Alım</div>
+            <div class="val val-kirmizi">{{ toplam_alim }} ₺</div>
+            <div style="font-size:12px;color:#888;margin-top:4px;">{{ alim_sayisi }} kayıt</div>
+        </div>
+        <div class="ozet-kart">
+            <div class="lbl">Toplam Ödeme</div>
+            <div class="val val-yesil">{{ toplam_odeme }} ₺</div>
+            <div style="font-size:12px;color:#888;margin-top:4px;">{{ odeme_sayisi }} ödeme</div>
+        </div>
+        <div class="ozet-kart">
+            <div class="lbl">{% if bakiye > 0 %}🔴 Borcumuz{% else %}🟢 Fazla Ödeme{% endif %}</div>
+            <div class="val {% if bakiye > 0 %}val-kirmizi{% else %}val-yesil{% endif %}">
+                {{ bakiye_goster }} ₺
+            </div>
+            <div style="font-size:12px;color:#888;margin-top:4px;">
+                {% if bakiye > 0 %}Ödenmesi gereken{% else %}Avans verilmiş{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tablo-kart">
+        <div class="tablo-baslik">
+            <span>📋 Tüm Hareketler</span>
+            <a href="{{ ekstre_url }}" target="_blank"
+               style="background:#c0392b;color:white;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;">
+                📄 PDF Ekstre
+            </a>
+        </div>
+        <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>İşlem</th>
+                    <th>Açıklama</th>
+                    <th style="text-align:right;">Borç (₺)</th>
+                    <th style="text-align:right;">Ödeme (₺)</th>
+                    <th style="text-align:right;">Bakiye (₺)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for satir in satirlar %}
+                <tr>
+                    <td style="white-space:nowrap;">{{ satir.hareket.tarih|date:"d.m.Y" }}</td>
+                    <td>
+                        {% if satir.hareket.islem_tipi == 'alimgiris' %}
+                            <span class="etk etk-turuncu">📦 Alım</span>
+                        {% elif satir.hareket.islem_tipi == 'odeme' %}
+                            <span class="etk etk-yesil">💸 Ödeme</span>
+                        {% else %}
+                            <span class="etk" style="background:#f0f0f0;color:#666;">{{ satir.hareket.get_islem_tipi_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size:12px;color:#555;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        {{ satir.hareket.aciklama|default:"—" }}
+                    </td>
+                    <td style="text-align:right;">
+                        {% if satir.hareket.islem_tipi == 'alimgiris' %}
+                            <b style="color:#c0392b;">{{ satir.hareket.miktar|floatformat:2 }}</b>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="text-align:right;">
+                        {% if satir.hareket.islem_tipi == 'odeme' %}
+                            <b style="color:#155724;">{{ satir.hareket.miktar|floatformat:2 }}</b>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="text-align:right;">
+                        <b style="color:{% if satir.bakiye > 0 %}#c0392b{% elif satir.bakiye < 0 %}#155724{% else %}#888{% endif %};">
+                            {{ satir.bakiye|floatformat:2 }}
+                        </b>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center;color:#888;padding:20px;">Hareket yok.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

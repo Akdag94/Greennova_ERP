@@ -1,0 +1,62 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}GİDER MAKBUZU{% endblock %}
+{% block belge_no %}No: {{ belge_no }}{% endblock %}
+
+{% block content %}
+
+<table class="taraflar-table">
+    <tr>
+        <td class="taraf-kutu" style="width:100%;">
+            <div class="taraf-baslik">Düzenleyen</div>
+            <div class="taraf-ad">{{ COMPANY_NAME }}</div>
+            <div class="taraf-detay">{{ COMPANY_ADDRESS }}</div>
+        </td>
+    </tr>
+</table>
+
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Kategori</th>
+            <th>Başlık</th>
+            <th>Açıklama</th>
+            <th class="right">Tutar (₺)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ gider.tarih|date:"d.m.Y" }}</td>
+            <td>{{ gider.get_kategori_display }}</td>
+            <td><b>{{ gider.baslik }}</b></td>
+            <td style="font-size:8.5pt; color:#555;">{{ gider.aciklama|default:"—" }}</td>
+            <td class="right text-red"><b>{{ gider.miktar|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4" class="right">HARCAMA TOPLAMI:</td>
+            <td class="right text-red">{{ gider.miktar|floatformat:2 }} ₺</td>
+        </tr>
+    </tfoot>
+</table>
+
+<table class="imza-table" style="margin-top:40pt;">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Harcamayı Yapan</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Onaylayan<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Muhasebe<br>{{ COMPANY_NAME }}</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

@@ -1,0 +1,389 @@
+{% extends 'site/base.html' %}
+{% block title %}GreenNova — Patron Paneli{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{--g:#28a745;--gd:#1e7e34;--gl:#e8f5ec;--r:#dc3545;--b:#007bff;--o:#fd7e14;--bg:#f4f6f9;--card:#fff;--border:#dee2e6;--shadow:0 2px 12px rgba(0,0,0,.07);}
+body{background:var(--bg);}nav{padding:10px 20px;}
+.hero-bar{background:linear-gradient(135deg,#0d1f0f 0%,#1a4d23 50%,#28a745 100%);color:white;padding:22px 26px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.hero-bar h1{font-size:20px;font-weight:800;margin:0;}.hero-bar .sub{font-size:12px;opacity:.75;margin-top:2px;}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap;}
+.hbtn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.hw{background:white;color:var(--gd);}.ho{background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.4);}
+.pw{max-width:1280px;margin:0 auto;padding:18px 14px;}
+.card{background:var(--card);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.card-title{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#666;font-weight:700;margin-bottom:5px;}
+.card-value{font-size:26px;font-weight:800;color:#1a1a2e;letter-spacing:-.5px;line-height:1;}
+.card-sub{font-size:11px;color:#888;margin-top:5px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.sekh{display:flex;align-items:center;justify-content:space-between;margin:18px 0 9px;}
+.sekh h2{font-size:14px;font-weight:800;margin:0;display:flex;align-items:center;gap:7px;}
+.sekh a{font-size:12px;color:var(--g);font-weight:600;text-decoration:none;padding:4px 10px;background:var(--gl);border-radius:15px;}
+.sekh a:hover{background:var(--g);color:white;}
+/* RENK SİSTEMİ — NET KURALLAR */
+.c-alacak{color:#0056b3;} /* Müşterilerden alacak = mavi */
+.c-borc{color:#c0392b;}   /* Müstahsile borç = kırmızı */
+.c-kar{color:#155724;}    /* Kâr / pozitif = koyu yeşil */
+.c-zarar{color:#c0392b;}  /* Zarar / negatif = kırmızı */
+.c-gider{color:#c0392b;}  /* Gider = kırmızı */
+.c-satis{color:#0056b3;}  /* Satış = mavi */
+.c-muted{color:#888;}
+/* PARA AKıŞı RENK AÇIKLAMASI */
+.renk-aciklama{background:white;border-radius:8px;padding:10px 14px;margin-bottom:14px;border:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap;font-size:11px;}
+.renk-chip{display:inline-flex;align-items:center;gap:5px;font-weight:700;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.slist{list-style:none;padding:0;margin:0;}
+.slist li{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.slist li:last-child{border-bottom:0;}
+.slist .nm{font-weight:600;}
+.slist a{text-decoration:none;color:inherit;}
+.slist a:hover .nm{color:var(--g);}
+.tir-kart{padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.tir-kart:last-child{border-bottom:0;}
+.tir-plaka{font-weight:800;font-size:13px;background:#f0f0f0;padding:2px 7px;border-radius:4px;}
+.aksiyonlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-top:7px;}
+.ak-btn{background:white;border:1.5px solid var(--border);border-radius:9px;padding:13px 8px;text-align:center;text-decoration:none;transition:all .15s;}
+.ak-btn:hover{border-color:var(--g);background:var(--gl);transform:translateY(-2px);box-shadow:0 4px 12px rgba(40,167,69,.15);}
+.ak-icon{font-size:20px;display:block;margin-bottom:4px;}
+.ak-label{font-size:11px;font-weight:700;color:#1a1a2e;}
+.prog-wrap{margin:6px 0;}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:2px;}
+.prog-bar{height:5px;background:#e9ecef;border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;}
+.etk{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;}
+.etk-g{background:var(--gl);color:var(--gd);}
+.etk-r{background:#fdecea;color:var(--r);}
+.etk-b{background:#e3f0ff;color:var(--b);}
+.etk-o{background:#fff3e0;color:var(--o);}
+/* ÖZELLİKLER BÖLÜMÜ */
+.ozellik-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;}
+.ozellik-kart{background:white;border-radius:10px;padding:20px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.ozellik-kart .ok-icon{font-size:28px;margin-bottom:10px;}
+.ozellik-kart h3{font-size:14px;font-weight:800;margin-bottom:6px;}
+.ozellik-kart p{font-size:12px;color:#666;line-height:1.6;}
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:580px){.g4,.g3,.g2{grid-template-columns:1fr;}.hero-bar h1{font-size:16px;}.card-value{font-size:20px;}}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-bar">
+    <div>
+        <h1>📊 GreenNova — Patron Paneli</h1>
+        <div class="sub">{{ bugun|date:"d F Y, l" }} · Anlık özet</div>
+    </div>
+    <div class="hbtns">
+        <a href="/admin/" class="hbtn hw">⚙️ Yönetim</a>
+        <a href="/inventory/scan/" class="hbtn ho">📱 QR</a>
+        <a href="/site/yardim/" class="hbtn ho">❓ Rehber</a>
+    </div>
+</div>
+
+<div class="pw">
+
+{% if aktif_tir_sayisi == 0 %}
+<div style="background:#fff3cd;border-left:3px solid #ffc107;padding:9px 14px;border-radius:7px;margin-bottom:14px;font-size:13px;">
+    ⚠️ Aktif tır yok.
+    <a href="/admin/finance/sevkiyat/add/" style="color:#856404;font-weight:700;margin-left:6px;">Yeni sevkiyat oluştur →</a>
+</div>
+{% endif %}
+
+<!-- ========================
+     ANA RAKAMLAR
+     ======================== -->
+<div class="g4">
+    <div class="card">
+        <div class="card-title">Bu Ay Satış</div>
+        <div class="card-value c-satis">{{ bu_ay_satis }} ₺</div>
+        <div class="card-sub">
+            Bu hafta: <b>{{ bu_hafta_satis }} ₺</b>
+            {% if satis_degisim > 0 %}<span class="etk etk-g" style="margin-left:3px;">▲ %{{ satis_degisim }}</span>
+            {% elif satis_degisim < 0 %}<span class="etk etk-r" style="margin-left:3px;">▼ %{{ satis_degisim|floatformat:1 }}</span>{% endif %}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title">Yoldaki Tırlar</div>
+        <div class="card-value c-satis">{{ aktif_tir_sayisi }}</div>
+        <div class="card-sub">Şu an aktif sevkiyat</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Depodaki Stok</div>
+        <div class="card-value">{{ toplam_stok_kg }} KG</div>
+        <div class="card-sub">{{ toplam_stok_palet }} palet · {{ stok_maliyet }} ₺ maliyet</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Net Kâr (Toplam)</div>
+        <div class="card-value {% if net_kar_pozitif %}c-kar{% else %}c-zarar{% endif %}">
+            {% if net_kar_pozitif %}▲{% else %}▼{% endif %} {{ net_kar }} ₺
+        </div>
+        <div class="card-sub">Bu ay: <b>{{ bu_ay_kar }} ₺</b></div>
+    </div>
+</div>
+
+<!-- ========================
+     RENK AÇIKLAMA BANDI
+     ======================== -->
+<div class="renk-aciklama">
+    <span class="renk-chip"><span class="dot" style="background:#0056b3;"></span> Mavi = Alacak (müşteri bize borçlu)</span>
+    <span class="renk-chip"><span class="dot" style="background:#c0392b;"></span> Kırmızı = Borç (biz müstahsile borçluyuz) veya Gider</span>
+    <span class="renk-chip"><span class="dot" style="background:#155724;"></span> Yeşil = Kâr / Pozitif</span>
+</div>
+
+<!-- ========================
+     PARA AKIŞI
+     ======================== -->
+<div class="sekh"><h2>💳 Para Akışı</h2></div>
+<div class="g4">
+    <a href="/site/detay/musteri/" style="text-decoration:none;">
+        <div class="card" style="cursor:pointer;transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,86,179,.2)'" onmouseout="this.style.boxShadow=''">
+            <div class="card-title">📥 Müşteri Alacağımız</div>
+            <div class="card-value c-alacak">{{ toplam_musteri_alacak }} ₺</div>
+            <div class="card-sub">{{ toplam_musteri }} müşteri · <span style="color:var(--g);">Detay için tıkla →</span></div>
+        </div>
+    </a>
+    <div class="card">
+        <div class="card-title">⏳ Ödenmemiş Alacak</div>
+        <div class="card-value c-alacak">{{ bekleyen_alacak }} ₺</div>
+        <div class="card-sub">Tahsil edilmeyi bekliyor</div>
+    </div>
+    <a href="/site/detay/mustahsil/" style="text-decoration:none;">
+        <div class="card" style="cursor:pointer;transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(192,57,43,.2)'" onmouseout="this.style.boxShadow=''">
+            <div class="card-title">🔴 Müstahsil Borcumuz</div>
+            <div class="card-value c-borc">{{ toplam_mustahsil_borc }} ₺</div>
+            <div class="card-sub">{{ toplam_mustahsil }} üretici · <span style="color:var(--g);">Detay için tıkla →</span></div>
+        </div>
+    </a>
+    <a href="/site/detay/giderler/" style="text-decoration:none;">
+        <div class="card" style="cursor:pointer;transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(192,57,43,.2)'" onmouseout="this.style.boxShadow=''">
+            <div class="card-title">🧾 Bu Ay Gider</div>
+            <div class="card-value c-gider">{{ bu_ay_gider }} ₺</div>
+            <div class="card-sub">Toplam: {{ toplam_gider }} ₺ · <span style="color:var(--g);">Detay →</span></div>
+        </div>
+    </a>
+</div>
+
+<!-- ========================
+     DETAY TABLOLAR
+     ======================== -->
+<div class="g2" style="margin-top:14px;align-items:start;">
+    <div class="card">
+        <div class="sekh" style="margin:0 0 10px;">
+            <h2 style="font-size:13px;">🏪 En Fazla Alacaklı Müşteriler</h2>
+            <a href="/admin/finance/musteri/">Tümü →</a>
+        </div>
+        {% if en_cok_borc_musteri %}
+        <ul class="slist">
+            {% for m in en_cok_borc_musteri %}
+            <li>
+                <a href="/site/detay/musteri/{{ m.id }}/" style="display:flex;justify-content:space-between;align-items:center;width:100%;text-decoration:none;">
+                    <span class="nm">{{ m.unvan }}</span>
+                    <span style="font-weight:700;color:#0056b3;">{{ m.toplam_alacagimiz|floatformat:0 }} ₺</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p style="color:#888;font-size:13px;text-align:center;padding:16px 0;">✅ Tüm hesaplar kapalı</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="sekh" style="margin:0 0 10px;">
+            <h2 style="font-size:13px;">👨‍🌾 En Fazla Borçlu Olduğumuz Müstahsiller</h2>
+            <a href="/admin/finance/mustahsil/">Tümü →</a>
+        </div>
+        {% if en_cok_borc_mustahsil %}
+        <ul class="slist">
+            {% for m in en_cok_borc_mustahsil %}
+            <li>
+                <a href="/site/detay/mustahsil/{{ m.id }}/" style="display:flex;justify-content:space-between;align-items:center;width:100%;text-decoration:none;">
+                    <span class="nm">{{ m.ad_soyad }}</span>
+                    <span style="font-weight:700;color:#c0392b;">{{ m.toplam_borc|floatformat:0 }} ₺</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p style="color:#888;font-size:13px;text-align:center;padding:16px 0;">✅ Tüm borçlar ödenmiş</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ========================
+     AKTİF TIRLAR + ÜRÜN STOĞU
+     ======================== -->
+<div class="g2" style="margin-top:12px;align-items:start;">
+    <div class="card">
+        <div class="sekh" style="margin:0 0 10px;">
+            <h2 style="font-size:13px;">🚛 Yoldaki Tırlar</h2>
+            <a href="/admin/finance/sevkiyat/add/">+ Yeni →</a>
+        </div>
+        {% if aktif_tir_detay %}
+            {% for item in aktif_tir_detay %}
+            <div class="tir-kart">
+                <div>
+                    <span class="tir-plaka">{{ item.tir.plaka }}</span>
+                    <div style="font-size:11px;color:#888;margin-top:2px;">
+                        {{ item.tir.musteri.unvan|default:"—" }} · {{ item.tir.cikis_tarihi|date:"d.m H:i" }}
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:700;color:#0056b3;font-size:13px;">{{ item.kg|floatformat:0 }} KG</div>
+                    <div style="font-size:11px;color:#888;">{{ item.palet_adet }} palet</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p style="color:#888;font-size:13px;text-align:center;padding:16px 0;">Yolda tır yok</p>
+        {% endif %}
+        <div style="margin-top:10px;">
+            <a href="/admin/finance/sevkiyat/" style="font-size:12px;color:var(--g);font-weight:600;">Tüm sevkiyatlar →</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="sekh" style="margin:0 0 10px;">
+            <h2 style="font-size:13px;">📦 Depodaki Ürünler</h2>
+            <a href="/admin/inventory/palet/">Tümü →</a>
+        </div>
+        {% if urun_stok %}
+            {% for u in urun_stok %}
+            <div class="prog-wrap">
+                <div class="prog-label">
+                    <span style="font-weight:600;">{{ u.urun_cinsi__ad|default:"Bilinmiyor" }}</span>
+                    <span style="font-weight:700;">{{ u.kg|floatformat:0 }} KG · {{ u.palet }} palet</span>
+                </div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:{{ u.palet }}%;background:var(--g);max-width:100%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p style="color:#888;font-size:13px;text-align:center;padding:16px 0;">Stok yok</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ========================
+     GRAFİK
+     ======================== -->
+<div class="sekh"><h2>📈 Son 7 Gün Satış Performansı</h2></div>
+<div class="card">
+    <div style="position:relative;height:170px;">
+        <canvas id="salesChart"></canvas>
+    </div>
+</div>
+
+<!-- ========================
+     DEPO DOLULUK
+     ======================== -->
+{% if depolar %}
+<div class="sekh">
+    <h2>🏭 Depo Doluluk</h2>
+    <a href="/admin/inventory/depo/">Tümü →</a>
+</div>
+<div class="g3">
+    {% for d in depolar %}
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+            <span style="font-weight:700;font-size:13px;">{{ d.ad }}</span>
+            <span class="etk {% if d.doluluk_orani > 90 %}etk-r{% elif d.doluluk_orani > 70 %}etk-o{% else %}etk-g{% endif %}">%{{ d.doluluk_orani }}</span>
+        </div>
+        <div class="prog-bar">
+            <div class="prog-fill" style="width:{{ d.doluluk_orani }}%;background:{% if d.doluluk_orani > 90 %}#c0392b{% elif d.doluluk_orani > 70 %}#fd7e14{% else %}#28a745{% endif %};"></div>
+        </div>
+        <div style="font-size:11px;color:#888;margin-top:5px;">{{ d.mevcut_palet_sayisi }} / {{ d.kapasite_palet }} palet{% if d.sicaklik %} · {{ d.sicaklik }}{% endif %}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ========================
+     HIZLI AKSİYONLAR
+     ======================== -->
+<div class="sekh"><h2>⚡ Hızlı İşlemler</h2></div>
+<div class="aksiyonlar">
+    <a href="/admin/inventory/palet/add/" class="ak-btn"><span class="ak-icon">⚖️</span><span class="ak-label">Kantar Girişi</span></a>
+    <a href="/admin/finance/sevkiyat/add/" class="ak-btn"><span class="ak-icon">🚛</span><span class="ak-label">Yeni Tır</span></a>
+    <a href="/inventory/scan/" class="ak-btn"><span class="ak-icon">📱</span><span class="ak-label">QR Terminal</span></a>
+    <a href="/admin/finance/carihareket/add/" class="ak-btn"><span class="ak-icon">💸</span><span class="ak-label">Müstahsil Öde</span></a>
+    <a href="/admin/finance/musterihareket/add/" class="ak-btn"><span class="ak-icon">💰</span><span class="ak-label">Tahsilat Al</span></a>
+    <a href="/admin/finance/gider/add/" class="ak-btn"><span class="ak-icon">🧾</span><span class="ak-label">Gider Gir</span></a>
+    <a href="/site/detay/giderler/" class="ak-btn"><span class="ak-icon">📊</span><span class="ak-label">Gider Detay</span></a>
+    <a href="/site/yardim/" class="ak-btn"><span class="ak-icon">❓</span><span class="ak-label">Rehber</span></a>
+</div>
+
+<!-- ========================
+     ÖZELLİKLER BÖLÜMÜ
+     ======================== -->
+<div class="sekh" id="ozellikler"><h2>🌟 Sistem Özellikleri</h2></div>
+<div class="ozellik-grid">
+    <div class="ozellik-kart">
+        <div class="ok-icon">⚖️</div>
+        <h3>Kantar & Mal Kabul</h3>
+        <p>Müstahsilin getirdiği malı brüt/net kg ile kaydet. Fire otomatik hesaplanır. QR kodu anında üretilir.</p>
+    </div>
+    <div class="ozellik-kart">
+        <div class="ok-icon">📱</div>
+        <h3>QR Terminal — Offline Çalışır</h3>
+        <p>İnternetsiz ortamda palet tara, tıra yükle. Bağlantı gelince otomatik senkronize olur. Çatışma varsa bildirir.</p>
+    </div>
+    <div class="ozellik-kart">
+        <div class="ok-icon">🚛</div>
+        <h3>Tır & Sevkiyat Yönetimi</h3>
+        <p>Tır oluştur, palet yükle, müşteri seç. Tamamlandığında cari otomatik işlenir, kâr/zarar hesaplanır.</p>
+    </div>
+    <div class="ozellik-kart">
+        <div class="ok-icon">💳</div>
+        <h3>Cari Hesap Takibi</h3>
+        <p>Müstahsil ve müşteri cari hareketleri anlık güncellenir. Kim kime ne kadar borçlu tek ekranda görülür.</p>
+    </div>
+    <div class="ozellik-kart">
+        <div class="ok-icon">📄</div>
+        <h3>Belge & PDF Yazdırma</h3>
+        <p>Makbuz, fatura, irsaliye, cari ekstre — hepsi logolu, imzalı A4 PDF olarak bir tıkla yazdırılır.</p>
+    </div>
+    <div class="ozellik-kart">
+        <div class="ok-icon">👔</div>
+        <h3>Patron Paneli</h3>
+        <p>Bu sayfa: tek bakışta kâr, stok, tır, alacak, borç, gider. Her kutunun detayına tıkla, kim neden görsün.</p>
+    </div>
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// sig:76a253b5-AA
+const ctx = document.getElementById('salesChart').getContext('2d');
+new Chart(ctx, {
+    type:'bar',
+    data:{
+        labels:{{ grafik_gunler|safe }},
+        datasets:[
+            {label:'Satış (₺)',data:{{ grafik_satis|safe }},backgroundColor:'rgba(40,167,69,.85)',borderRadius:5,yAxisID:'y1'},
+            {label:'KG',data:{{ grafik_kg|safe }},type:'line',borderColor:'#007bff',backgroundColor:'rgba(0,123,255,.1)',borderWidth:2.5,pointRadius:3,fill:true,tension:.4,yAxisID:'y2'}
+        ]
+    },
+    options:{
+        responsive:true,maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+            legend:{position:'top',labels:{font:{size:11}}},
+            tooltip:{backgroundColor:'#1a1a2e',callbacks:{label:ctx=>ctx.dataset.label==='Satış (₺)'?`Satış: ${ctx.parsed.y.toLocaleString('tr-TR')} ₺`:`KG: ${ctx.parsed.y.toLocaleString('tr-TR')}`}}
+        },
+        scales:{
+            y1:{type:'linear',position:'left',grid:{color:'rgba(0,0,0,.03)'},ticks:{callback:v=>v.toLocaleString('tr-TR')+'₺',font:{size:9}}},
+            y2:{type:'linear',position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>v.toLocaleString('tr-TR')+'KG',font:{size:9}}},
+            x:{grid:{display:false},ticks:{font:{size:10}}}
+        }
+    }
+});
+</script>
+{% endblock %}

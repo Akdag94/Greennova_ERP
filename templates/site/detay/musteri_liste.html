@@ -1,0 +1,45 @@
+{% extends 'site/base.html' %}
+{% block title %}Müşteri Alacakları{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:0 auto;padding:20px 16px;">
+    <a href="/" style="color:#666;font-size:13px;display:inline-block;margin-bottom:14px;">← Ana Sayfa</a>
+    <div style="background:linear-gradient(135deg,#0d1a2e,#1a3a6e);color:white;padding:22px 26px;border-radius:12px;margin-bottom:18px;">
+        <h1 style="font-size:20px;font-weight:800;margin:0 0 5px;">📥 Müşteri Alacaklarımız</h1>
+        <div style="opacity:.75;font-size:13px;">Toplam: <b>{{ toplam_alacak }} ₺</b></div>
+    </div>
+    <div style="background:white;border-radius:10px;border:1px solid #dee2e6;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+            <thead><tr style="background:#f8f9fa;">
+                <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;">Müşteri</th>
+                <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;">Bölge</th>
+                <th style="padding:10px 14px;text-align:right;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;">Alacağımız</th>
+                <th style="padding:10px 14px;border-bottom:2px solid #dee2e6;"></th>
+            </tr></thead>
+            <tbody>
+                {% for m in musteriler %}
+                <tr style="border-bottom:1px solid #f0f0f0;">
+                    <td style="padding:10px 14px;font-size:13px;font-weight:600;">{{ m.unvan }}</td>
+                    <td style="padding:10px 14px;font-size:13px;color:#666;">{{ m.bolge|default:"—" }}</td>
+                    <td style="padding:10px 14px;text-align:right;">
+                        {% if m.toplam_alacagimiz > 0 %}
+                            <b style="color:#0056b3;">{{ m.toplam_alacagimiz|floatformat:2 }} ₺</b>
+                        {% elif m.toplam_alacagimiz < 0 %}
+                            <b style="color:#155724;">{{ m.toplam_alacagimiz|floatformat:2 }} ₺</b>
+                        {% else %}
+                            <span style="color:#888;">0,00 ₺</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:10px 14px;">
+                        <a href="/site/detay/musteri/{{ m.id }}/" style="background:#0056b3;color:white;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;text-decoration:none;">Detay</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center;color:#888;padding:20px;">Kayıt yok.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

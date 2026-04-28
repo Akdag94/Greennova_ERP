@@ -1,0 +1,98 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}TAŞIMA İRSALİYESİ{% endblock %}
+{% block belge_no %}No: {{ belge_no }}{% endblock %}
+
+{% block content %}
+
+<table class="taraflar-table">
+    <tr>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Gönderen</div>
+            <div class="taraf-ad">{{ COMPANY_NAME }}</div>
+            <div class="taraf-detay">{{ COMPANY_ADDRESS }}</div>
+        </td>
+        <td class="taraf-bosluk"></td>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Alıcı</div>
+            <div class="taraf-ad">{{ sevkiyat.musteri.unvan|upper }}</div>
+            <div class="taraf-detay">
+                {% if sevkiyat.musteri.bolge %}{{ sevkiyat.musteri.bolge }}{% endif %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- ARAÇ BİLGİSİ -->
+<table class="veri-tablo" style="margin-bottom:10pt;">
+    <thead>
+        <tr><th colspan="4" style="text-align:center;">Araç ve Sürücü Bilgileri</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="width:25%;"><b>Plaka:</b> {{ sevkiyat.plaka }}</td>
+            <td style="width:35%;"><b>Şoför:</b> {{ sevkiyat.sofor_ad }}</td>
+            <td style="width:40%;"><b>Çıkış Tarihi:</b> {{ sevkiyat.cikis_tarihi|date:"d.m.Y H:i" }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- MAL LİSTESİ -->
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Palet No</th>
+            <th>Ürün Cinsi</th>
+            <th>Müstahsil</th>
+            <th class="right">Brüt KG</th>
+            <th class="right">Net KG</th>
+            <th class="right">Palet Adedi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for palet in paletler %}
+        <tr>
+            <td style="color:#888; font-size:8pt;">{{ forloop.counter }}</td>
+            <td style="font-size:8pt;">{{ palet.palet_no }}</td>
+            <td>{{ palet.urun_cinsi.ad }}</td>
+            <td style="font-size:8.5pt;">{{ palet.mustahsil.ad_soyad }}</td>
+            <td class="right">{{ palet.brut_miktar_kg|floatformat:2 }}</td>
+            <td class="right">{{ palet.miktar_kg|floatformat:2|default:"—" }}</td>
+            <td class="right">{{ palet.toplam_palet_adedi }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4" class="right"><b>GENEL TOPLAM:</b></td>
+            <td class="right" colspan="2"><b>{{ toplam_kg|floatformat:2 }} KG</b></td>
+            <td class="right"><b>{{ toplam_palet }} Palet</b></td>
+        </tr>
+    </tfoot>
+</table>
+
+<div class="not-kutu" style="margin-top:10pt;">
+    <div class="not-baslik">Taşıma Şartları</div>
+    Malların teslimatta eksiksiz ve hasarsız olduğu kabul edilmiştir.
+    Herhangi bir hasar veya eksiklik teslimat anında tutanak altına alınmalıdır.
+</div>
+
+<table class="imza-table">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Yükleyen<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Sürücü<br>{{ sevkiyat.sofor_ad }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Teslim Alan<br>{{ sevkiyat.musteri.unvan }}</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

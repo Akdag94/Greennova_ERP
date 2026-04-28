@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {% if gider_raporu_url %}
+    <li>
+        <a href="{{ gider_raporu_url }}" target="_blank"
+           style="background:#dc3545; color:white; padding:8px 14px; border-radius:6px;
+                  text-decoration:none; font-size:13px; font-weight:600; display:inline-block;">
+            📊 Bu Ay Dönem Raporu
+        </a>
+    </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

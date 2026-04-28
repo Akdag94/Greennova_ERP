@@ -1,0 +1,80 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}TAHSİLAT MAKBUZU{% endblock %}
+{% block belge_no %}No: {{ belge_no }}{% endblock %}
+
+{% block content %}
+
+<table class="taraflar-table">
+    <tr>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Tahsilat Yapan</div>
+            <div class="taraf-ad">{{ COMPANY_NAME }}</div>
+            <div class="taraf-detay">{{ COMPANY_ADDRESS }}</div>
+        </td>
+        <td class="taraf-bosluk"></td>
+        <td class="taraf-kutu">
+            <div class="taraf-baslik">Ödeyen Müşteri</div>
+            <div class="taraf-ad">{{ musteri.unvan|upper }}</div>
+            <div class="taraf-detay">
+                {% if musteri.bolge %}{{ musteri.bolge }}<br>{% endif %}
+                {% if musteri.telefon %}Tel: {{ musteri.telefon }}{% endif %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Açıklama</th>
+            <th>İlgili Tır</th>
+            <th class="right">Tahsil Edilen (₺)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ hareket.tarih|date:"d.m.Y" }}</td>
+            <td>{{ hareket.aciklama|default:"Müşteri tahsilatı" }}</td>
+            <td>{{ hareket.sevkiyat.plaka|default:"—" }}</td>
+            <td class="right text-green"><b>{{ hareket.miktar|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="right">TAHSİL EDİLEN TOPLAM:</td>
+            <td class="right text-green">{{ hareket.miktar|floatformat:2 }} ₺</td>
+        </tr>
+    </tfoot>
+</table>
+
+<table class="veri-tablo" style="width:50%; float:right; margin-top:6pt;">
+    <thead><tr><th colspan="2">Güncel Bakiye</th></tr></thead>
+    <tbody>
+        <tr>
+            <td>Kalan Alacağımız:</td>
+            <td class="right"><b>{{ musteri.toplam_alacagimiz|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tbody>
+</table>
+<div style="clear:both;"></div>
+
+<table class="imza-table" style="margin-top:30pt;">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Ödeyen<br>{{ musteri.unvan }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Tahsil Eden<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Onay / Kaşe</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

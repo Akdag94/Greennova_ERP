@@ -1,0 +1,88 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}GİDER RAPORU{% endblock %}
+{% block belge_no %}{{ baslangic|date:"d.m.Y" }} — {{ bitis|date:"d.m.Y" }}{% endblock %}
+
+{% block content %}
+
+<!-- KATEGORİ ÖZETİ -->
+<table class="veri-tablo" style="width:55%; float:right; margin-left:10pt;">
+    <thead>
+        <tr><th colspan="2">Kategoriye Göre Özet</th></tr>
+    </thead>
+    <tbody>
+        {% for k in kategori_ozet %}
+        <tr>
+            <td>{{ k.kategori }}</td>
+            <td class="right"><b>{{ k.toplam|floatformat:2 }} ₺</b></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td class="right"><b>TOPLAM:</b></td>
+            <td class="right text-red"><b>{{ toplam|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- DÖNEM BİLGİSİ -->
+<table style="width:43%; float:left;">
+    <tr>
+        <td style="padding:6pt 0; font-size:9pt; color:#555;">
+            <b>Dönem:</b> {{ baslangic|date:"d.m.Y" }} – {{ bitis|date:"d.m.Y" }}<br>
+            <b>Toplam Kayıt:</b> {{ giderler|length }}<br>
+            <b>Toplam Gider:</b> <span style="color:#dc3545; font-size:11pt; font-weight:bold;">{{ toplam|floatformat:2 }} ₺</span>
+        </td>
+    </tr>
+</table>
+<div style="clear:both; margin-bottom:14pt;"></div>
+
+<!-- DETAY LİSTESİ -->
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th style="width:60pt;">Tarih</th>
+            <th style="width:80pt;">Kategori</th>
+            <th>Başlık</th>
+            <th>Açıklama</th>
+            <th class="right" style="width:75pt;">Tutar (₺)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for g in giderler %}
+        <tr>
+            <td>{{ g.tarih|date:"d.m.Y" }}</td>
+            <td style="font-size:8pt;">{{ g.get_kategori_display }}</td>
+            <td>{{ g.baslik }}</td>
+            <td style="font-size:8pt; color:#555;">{{ g.aciklama|default:"—"|truncatechars:40 }}</td>
+            <td class="right">{{ g.miktar|floatformat:2 }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center; color:#888; padding:10pt;">Bu dönemde gider kaydı yok.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4" class="right"><b>TOPLAM:</b></td>
+            <td class="right text-red"><b>{{ toplam|floatformat:2 }} ₺</b></td>
+        </tr>
+    </tfoot>
+</table>
+
+<table class="imza-table" style="margin-top:20pt;">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Hazırlayan<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Onaylayan<br>{{ COMPANY_NAME }}</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

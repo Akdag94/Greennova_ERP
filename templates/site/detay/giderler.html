@@ -1,0 +1,103 @@
+{% extends 'site/base.html' %}
+{% block title %}Gider Detayı{% endblock %}
+
+{% block extra_css %}
+<style>
+.pw{max-width:900px;margin:0 auto;padding:20px 16px;}
+.detay-header{background:linear-gradient(135deg,#1a0000,#8b0000);color:white;padding:24px 28px;border-radius:12px;margin-bottom:20px;}
+.detay-header h1{font-size:20px;font-weight:800;margin:0 0 6px;}
+.ozet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.ozet-kart{background:white;border-radius:10px;padding:16px;border:1px solid #dee2e6;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.ozet-kart .lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:700;}
+.ozet-kart .val{font-size:22px;font-weight:800;color:#c0392b;}
+.tablo-kart{background:white;border-radius:10px;border:1px solid #dee2e6;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.tablo-baslik{padding:14px 18px;font-weight:800;font-size:14px;border-bottom:1px solid #dee2e6;display:flex;justify-content:space-between;align-items:center;}
+table{width:100%;border-collapse:collapse;}
+th{background:#f8f9fa;padding:9px 14px;text-align:left;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #dee2e6;font-weight:700;}
+td{padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:13px;}
+tr:last-child td{border-bottom:0;}tr:hover td{background:#f8f9fa;}
+.kat-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:#fdecea;color:#c0392b;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-bar a{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:white;border:1.5px solid #dee2e6;color:#333;text-decoration:none;}
+.filter-bar a.aktif,.filter-bar a:hover{background:#c0392b;color:white;border-color:#c0392b;}
+@media(max-width:600px){.ozet-grid{grid-template-columns:1fr 1fr;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pw">
+
+    <a href="/" style="display:inline-flex;align-items:center;gap:6px;color:#666;font-size:13px;margin-bottom:14px;text-decoration:none;">
+        ← Ana Sayfaya Dön
+    </a>
+
+    <div class="detay-header">
+        <h1>🧾 Gider Detayı</h1>
+        <div style="opacity:.75;font-size:13px;">Tüm işletme giderleri</div>
+    </div>
+
+    <div class="ozet-grid">
+        <div class="ozet-kart">
+            <div class="lbl">Bu Ay Gider</div>
+            <div class="val">{{ bu_ay_toplam }} ₺</div>
+            <div style="font-size:12px;color:#888;margin-top:4px;">{{ bu_ay_sayi }} kayıt</div>
+        </div>
+        <div class="ozet-kart">
+            <div class="lbl">Bu Yıl Gider</div>
+            <div class="val">{{ bu_yil_toplam }} ₺</div>
+        </div>
+        <div class="ozet-kart">
+            <div class="lbl">Toplam Gider</div>
+            <div class="val">{{ toplam }} ₺</div>
+            <div style="font-size:12px;color:#888;margin-top:4px;">{{ toplam_sayi }} kayıt</div>
+        </div>
+    </div>
+
+    <!-- KATEGORİ FİLTRE -->
+    <div class="filter-bar">
+        <a href="/site/detay/giderler/" class="{% if not aktif_kat %}aktif{% endif %}">Tümü</a>
+        {% for kat_kodu, kat_ad in kategoriler %}
+            <a href="/site/detay/giderler/?kat={{ kat_kodu }}"
+               class="{% if aktif_kat == kat_kodu %}aktif{% endif %}">
+                {{ kat_ad }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="tablo-kart">
+        <div class="tablo-baslik">
+            <span>📋 Gider Listesi ({{ giderler|length }})</span>
+            <a href="{{ rapor_url }}" target="_blank"
+               style="background:#c0392b;color:white;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;">
+                📊 Bu Ay Raporu
+            </a>
+        </div>
+        <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>Kategori</th>
+                    <th>Başlık</th>
+                    <th>Açıklama</th>
+                    <th style="text-align:right;">Tutar (₺)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in giderler %}
+                <tr>
+                    <td style="white-space:nowrap;">{{ g.tarih|date:"d.m.Y" }}</td>
+                    <td><span class="kat-chip">{{ g.get_kategori_display }}</span></td>
+                    <td><b>{{ g.baslik }}</b></td>
+                    <td style="font-size:12px;color:#555;">{{ g.aciklama|default:"—"|truncatechars:40 }}</td>
+                    <td style="text-align:right;"><b style="color:#c0392b;">{{ g.miktar|floatformat:2 }}</b></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">Kayıt yok.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

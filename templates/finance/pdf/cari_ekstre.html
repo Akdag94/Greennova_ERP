@@ -1,0 +1,91 @@
+{% extends "finance/pdf/base_pdf.html" %}
+
+{% block belge_tipi %}{{ baslik }}{% endblock %}
+{% block belge_no %}{{ cari_unvan|upper }}{% endblock %}
+
+{% block content %}
+
+<!-- CARİ BİLGİ -->
+<table class="taraflar-table" style="margin-bottom:12pt;">
+    <tr>
+        <td class="taraf-kutu" style="width:100%;">
+            <div class="taraf-baslik">Cari Hesap Sahibi</div>
+            <div class="taraf-ad">{{ cari_unvan|upper }}</div>
+            <div class="taraf-detay">{{ cari_detay }}</div>
+        </td>
+    </tr>
+</table>
+
+<!-- HAREKET TABLOSU -->
+<table class="veri-tablo">
+    <thead>
+        <tr>
+            <th style="width:60pt;">Tarih</th>
+            <th>İşlem Türü</th>
+            <th>Açıklama</th>
+            <th class="right" style="width:75pt;">Borç (₺)</th>
+            <th class="right" style="width:75pt;">Alacak (₺)</th>
+            <th class="right" style="width:80pt;">Bakiye (₺)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for satir in satirlar %}
+        <tr>
+            <td>{{ satir.hareket.tarih|date:"d.m.Y" }}</td>
+            <td>{{ satir.hareket.get_islem_tipi_display }}</td>
+            <td style="font-size:8pt; color:#555;">{{ satir.hareket.aciklama|default:"—"|truncatechars:45 }}</td>
+            <td class="right">
+                {% if satir.hareket.islem_tipi in 'alimgiris satis' %}
+                    {{ satir.hareket.miktar|floatformat:2 }}
+                {% else %}—{% endif %}
+            </td>
+            <td class="right">
+                {% if satir.hareket.islem_tipi not in 'alimgiris satis' %}
+                    {{ satir.hareket.miktar|floatformat:2 }}
+                {% else %}—{% endif %}
+            </td>
+            <td class="right">
+                <b {% if satir.bakiye > 0 %}style="color:#c0392b;"{% else %}style="color:#27ae60;"{% endif %}>
+                    {{ satir.bakiye|floatformat:2 }}
+                </b>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="text-align:center; color:#888; padding:12pt;">
+                Hareket kaydı bulunamadı.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5" class="right">SON BAKİYE ({{ son_bakiye_aciklama }}):</td>
+            <td class="right">
+                <span {% if son_bakiye > 0 %}style="color:#c0392b; font-size:11pt;"{% else %}style="color:#27ae60; font-size:11pt;"{% endif %}>
+                    {{ son_bakiye|floatformat:2 }} ₺
+                </span>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- İMZA -->
+<table class="imza-table" style="margin-top:16pt;">
+    <tr>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Cari Hesap Sahibi<br>{{ cari_unvan }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Muhasebe<br>{{ COMPANY_NAME }}</div>
+        </td>
+        <td class="imza-kutu">
+            <div class="imza-cizgi"></div>
+            <div class="imza-label">Onay / Kaşe<br>{{ COMPANY_NAME }}</div>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

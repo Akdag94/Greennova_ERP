@@ -1,0 +1,626 @@
+{% extends 'site/base.html' %}
+{% block title %}GreenNova — Kullanım Rehberi{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{--g:#28a745;--gd:#1e7e34;--gl:#e8f5ec;--b:#007bff;--r:#dc3545;--o:#fd7e14;}
+body{background:#f4f6f9;}
+.pw{max-width:960px;margin:0 auto;padding:24px 16px 60px;}
+.page-hero{background:linear-gradient(135deg,#0d1f0f,#1a4d23);color:white;padding:32px;border-radius:14px;margin-bottom:24px;text-align:center;}
+.page-hero h1{font-size:24px;font-weight:800;margin:0 0 8px;}
+.page-hero p{opacity:.8;font-size:14px;margin:0;}
+.ynav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;justify-content:center;}
+.ynav a{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;background:white;border:1.5px solid #dee2e6;color:#333;text-decoration:none;transition:all .15s;}
+.ynav a:hover{background:var(--g);color:white;border-color:var(--g);}
+.bolum{background:white;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:18px;border:1px solid #dee2e6;overflow:hidden;}
+.bh{background:linear-gradient(90deg,var(--g),var(--gd));color:white;padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.bh .num{width:30px;height:30px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;}
+.bh h2{margin:0;font-size:16px;font-weight:800;}
+.bh p{margin:2px 0 0;font-size:11px;opacity:.85;}
+.bb{padding:20px;}
+.akis{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:14px 0;justify-content:center;}
+.aa{text-align:center;padding:10px 12px;background:var(--gl);border:1.5px solid var(--g);border-radius:8px;min-width:80px;font-size:11px;font-weight:700;}
+.aa .i{font-size:18px;display:block;margin-bottom:3px;}
+.ok{color:var(--g);font-size:18px;margin:0 4px;font-weight:bold;}
+.adimlar{list-style:none;padding:0;margin:0;counter-reset:s;}
+.adimlar>li{counter-increment:s;display:flex;gap:12px;margin-bottom:12px;padding:12px;background:#f8f9fa;border-radius:8px;border-left:3px solid var(--g);}
+.adimlar>li::before{content:counter(s);background:var(--g);color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;margin-top:1px;}
+.adimlar>li .ic{flex:1;}
+.adimlar>li .tt{font-weight:700;font-size:13px;color:#1a1a2e;margin-bottom:2px;}
+.adimlar>li .ac{font-size:12px;color:#555;line-height:1.5;}
+.yol{font-family:monospace;background:#e9ecef;padding:2px 7px;border-radius:3px;font-size:11px;display:inline-block;margin-top:3px;}
+.uyari{padding:10px 14px;border-radius:7px;margin:10px 0;font-size:12px;display:flex;gap:8px;align-items:flex-start;line-height:1.5;}
+.uyari.dikkat{background:#fff3cd;border-left:3px solid #ffc107;}
+.uyari.ipucu{background:#e3f0ff;border-left:3px solid var(--b);}
+.uyari.onemli{background:#fdecea;border-left:3px solid var(--r);}
+.uyari.tamam{background:#e8f5ec;border-left:3px solid var(--g);}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+.sk{padding:10px 12px;border-radius:7px;font-size:12px;border-left:3px solid;}
+.sk.y{background:#e8f5ec;border-color:var(--g);}
+.sk.m{background:#e3f0ff;border-color:var(--b);}
+.sk.t{background:#fff3e0;border-color:var(--o);}
+.sk.k{background:#fdecea;border-color:var(--r);}
+.sk .sl{font-weight:800;font-size:10px;text-transform:uppercase;margin-bottom:2px;}
+.sim{background:#1e1e2e;border-radius:10px;overflow:hidden;margin:12px 0;font-size:12px;}
+.sim-bar{background:#2d2d44;padding:7px 12px;display:flex;align-items:center;gap:8px;}
+.sim-dot{width:9px;height:9px;border-radius:50%;}
+.sim-ic{padding:14px;color:#e0e0e0;font-family:monospace;line-height:1.8;}
+.sim-ic .lb{color:#75bfff;}.sim-ic .vl{color:#a8ff78;}.sim-ic .wn{color:#ffc107;}
+table.kk{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;}
+table.kk th{background:var(--g);color:white;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;}
+table.kk td{padding:8px 10px;border-bottom:1px solid #dee2e6;}
+table.kk tr:nth-child(even){background:#f8f9fa;}
+.evet{color:var(--g);font-weight:700;}.hayir{color:var(--r);}
+@media(max-width:600px){.sg{grid-template-columns:1fr;}.akis{gap:4px;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pw">
+
+<div class="page-hero">
+    <h1>📖 GreenNova ERP — Kullanım Rehberi</h1>
+    <p>Bu sayfayı okuyan herkes sistemi kullanabilir.<br>
+    Adım adım açıklama — hiçbir teknik bilgi gerekmez.</p>
+</div>
+
+<div class="ynav">
+    <a href="#akis">🔄 İş Akışı</a>
+    <a href="#kantar">⚖️ Kantar Girişi</a>
+    <a href="#depo">📦 Depo & Palet</a>
+    <a href="#tir">🚛 Tır & Sevkiyat</a>
+    <a href="#qr">📱 QR Terminal</a>
+    <a href="#para">💰 Para Akışı</a>
+    <a href="#belgeler">📄 Belgeler</a>
+    <a href="#patron">👔 Patron İçin</a>
+</div>
+
+<!-- =============================================
+     0. SİSTEM NEDİR
+     ============================================= -->
+<div class="bolum">
+    <div class="bh">
+        <div class="num">0</div>
+        <div><h2>Bu Sistem Ne İşe Yarar?</h2><p>Genel bakış</p></div>
+    </div>
+    <div class="bb">
+        <p style="font-size:14px;line-height:1.8;margin:0 0 14px;">
+            GreenNova ERP, <b>soğuk hava deposu olan bir tarım firması</b> için yapılmıştır.
+            Müstahsil (üretici) malını getirir, kantar girişi yapılır, depoya alınır,
+            müşteriye satılır ve tıra yüklenir. Tüm bu sürecin <b>cari hesapları, belgeleri
+            ve stok durumu</b> bu sistemde takip edilir.
+        </p>
+        <table class="kk">
+            <tr><th>Ne yapabilirsin?</th><th>Nerede?</th></tr>
+            <tr><td>✅ Kantar girişi</td><td class="yol">/admin/ → Paletler → Ekle</td></tr>
+            <tr><td>✅ Palet QR kodu üretmek</td><td>Otomatik (palet kaydedilince)</td></tr>
+            <tr><td>✅ Tıra palet yüklemek</td><td class="yol">/inventory/scan/</td></tr>
+            <tr><td>✅ Müstahsile ödeme kaydetmek</td><td class="yol">/admin/ → Cari Hareketler</td></tr>
+            <tr><td>✅ Müşteriden tahsilat almak</td><td class="yol">/admin/ → Müşteri Hareketleri</td></tr>
+            <tr><td>✅ PDF makbuz / fatura yazdırmak</td><td>Listede "Yazdır" butonuna tıkla</td></tr>
+            <tr><td>✅ Personel mesai takibi</td><td class="yol">/admin/ → Yoklama</td></tr>
+            <tr><td>✅ Stok & kâr/zarar görmek</td><td class="yol">/ → Ana sayfa</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- =============================================
+     1. İŞ AKIŞI
+     ============================================= -->
+<div class="bolum" id="akis">
+    <div class="bh">
+        <div class="num">1</div>
+        <div><h2>İş Akışı — Baştan Sona</h2><p>Bir malın yolculuğu</p></div>
+    </div>
+    <div class="bb">
+        <p style="font-size:13px;color:#555;margin:0 0 12px;">
+            Bir malın sisteme girişinden müşteriye teslimata kadar olan süreci:
+        </p>
+
+        <div class="akis">
+            <div class="aa"><span class="i">👨‍🌾</span>Müstahsil<br>Mal Getirir</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">⚖️</span>Kantar<br>Girişi</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">📦</span>Depoya<br>Alınır</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">🏷️</span>QR Kodu<br>Üretilir</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">🚛</span>Tıra<br>Yüklenir</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">🏪</span>Müşteriye<br>Teslim</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">💰</span>Tahsilat<br>Alınır</div>
+        </div>
+
+        <div class="sg">
+            <div class="sk y">
+                <div class="sl">✅ Otomatik olan şeyler</div>
+                Palet QR kodu otomatik üretilir.<br>
+                Sevkiyat tamamlanınca müşteri carisi güncellenir.<br>
+                Kantar girişinde müstahsil carisi güncellenir.
+            </div>
+            <div class="sk m">
+                <div class="sl">👆 Senin yapman gerekenler</div>
+                Kantar ağırlığını ve fiyatı girmek.<br>
+                Tıra palet yüklemek (QR ile).<br>
+                Ödeme ve tahsilatları kaydetmek.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     2. KANTAR GİRİŞİ
+     ============================================= -->
+<div class="bolum" id="kantar">
+    <div class="bh">
+        <div class="num">2</div>
+        <div><h2>⚖️ Kantar Girişi (Mal Alımı)</h2><p>Müstahsil mal getirdiğinde ne yapılır</p></div>
+    </div>
+    <div class="bb">
+
+        <div class="uyari ipucu">
+            💡 Kısayol: Ana sayfadaki <b>"⚖️ Kantar Girişi"</b> butonuna veya
+            <span class="yol">/admin/inventory/palet/add/</span> adresine git.
+        </div>
+
+        <ol class="adimlar">
+            <li>
+                <div class="ic">
+                    <div class="tt">Admin panelini aç</div>
+                    <div class="ac">
+                        Üst menüden <b>Yönetim Paneli</b>'ne tıkla.
+                        Kullanıcı adı ve şifrenle giriş yap.<br>
+                        <span class="yol">/admin/</span>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Depodaki Paletler → Ekle</div>
+                    <div class="ac">
+                        Sol menüde <b>Operasyon</b> → <b>Depodaki Paletler</b>'e tıkla,
+                        sağ üstten <b>+ EKLE</b> butonuna bas.
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Formu doldur</div>
+                    <div class="ac">
+                        <b>Ürün:</b> Hangi tarım ürünü (domates, biber...)<br>
+                        <b>Müstahsil:</b> Kimin malı<br>
+                        <b>Kantar Giriş (Brüt KG):</b> Kantardan gelen ağırlık<br>
+                        <b>Paketlenen/Stok (Net KG):</b> Ayıklama sonrası kalan<br>
+                        <b>Birim Fiyat:</b> KG başına ödeme tutarı (₺)<br>
+                        <b>Toplam Palet Adedi:</b> Kaç palet çıktı
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Kaydet</div>
+                    <div class="ac">
+                        Kaydettiğinde sistem <b>otomatik olarak:</b><br>
+                        • Palet QR kodu üretir<br>
+                        • Müstahsil cari hesabına borç işler (Brüt KG × Birim Fiyat)
+                    </div>
+                </div>
+            </li>
+        </ol>
+
+        <div class="sim">
+            <div class="sim-bar">
+                <div class="sim-dot" style="background:#ff5f57;"></div>
+                <div class="sim-dot" style="background:#febc2e;"></div>
+                <div class="sim-dot" style="background:#28c840;"></div>
+                <span style="color:#aaa;font-size:11px;margin-left:8px;">Örnek Kayıt</span>
+            </div>
+            <div class="sim-ic">
+                <span class="lb">Ürün:</span> <span class="vl">Domates</span><br>
+                <span class="lb">Müstahsil:</span> <span class="vl">Ahmet Yılmaz (Yenişehir)</span><br>
+                <span class="lb">Kantar Giriş:</span> <span class="vl">1.000 KG</span><br>
+                <span class="lb">Net KG:</span> <span class="vl">850 KG</span> <span class="wn">← 150 KG fire</span><br>
+                <span class="lb">Birim Fiyat:</span> <span class="vl">10 ₺/KG</span><br>
+                <span class="lb">Toplam Tutar:</span> <span class="vl">10.000 ₺</span> <span class="wn">← otomatik</span><br>
+                <span class="lb">Palet Adedi:</span> <span class="vl">17 palet</span><br>
+                <span class="wn">→ Müstahsil Ahmet'e 10.000 ₺ borçlandık (otomatik)</span>
+            </div>
+        </div>
+
+        <div class="uyari dikkat">
+            ⚠️ <b>Dikkat:</b> Birim fiyat <b>Brüt KG</b> üzerinden hesaplanır.
+            Yani müstahsile getirdiği toplam ağırlığa göre ödeme yapılır,
+            fire düşülmez.
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     3. DEPO & PALET
+     ============================================= -->
+<div class="bolum" id="depo">
+    <div class="bh">
+        <div class="num">3</div>
+        <div><h2>📦 Depo ve Palet Takibi</h2><p>Stok nerede, ne durumda?</p></div>
+    </div>
+    <div class="bb">
+
+        <p style="font-size:13px;color:#555;margin:0 0 12px;">
+            Her palet kaydı bir durumda olur. Durum otomatik güncellenir:
+        </p>
+
+        <table class="kk">
+            <tr><th>Durum</th><th>Anlamı</th><th>Ne zaman olur?</th></tr>
+            <tr><td>🟡 İşleniyor</td><td>Yeni girildi, paketleniyor</td><td>İlk kayıtta</td></tr>
+            <tr><td>🟢 Depoda</td><td>Hazır, bekliyor</td><td>Depo odası seçilince</td></tr>
+            <tr><td>🔵 Tıra Yüklendi</td><td>Sevkiyata bağlandı</td><td>QR ile yüklenince</td></tr>
+            <tr><td>✅ Teslim Edildi</td><td>Müşteriye ulaştı</td><td>Sevkiyat tamamlanınca</td></tr>
+        </table>
+
+        <div class="uyari tamam">
+            ✅ <b>İpucu:</b> Depodaki paletleri görmek için
+            <span class="yol">/admin/inventory/palet/</span> → filtre: <b>Aktif Stok</b>
+        </div>
+
+        <div class="uyari ipucu">
+            💡 Her palet için <b>QR kodu otomatik üretilir.</b>
+            Paletler listesinde "Karekod" sütununda QR kodunu görebilir,
+            tıklayarak büyütebilirsin. Bunu yazdırıp palete yapıştır.
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     4. TIR & SEVKİYAT
+     ============================================= -->
+<div class="bolum" id="tir">
+    <div class="bh">
+        <div class="num">4</div>
+        <div><h2>🚛 Tır Oluşturma ve Sevkiyat</h2><p>Mal müşteriye nasıl gönderilir?</p></div>
+    </div>
+    <div class="bb">
+
+        <ol class="adimlar">
+            <li>
+                <div class="ic">
+                    <div class="tt">Yeni Tır Oluştur</div>
+                    <div class="ac">
+                        Admin → Sevkiyatlar → Ekle<br>
+                        <b>Plaka, Şoför, Müşteri</b> ve <b>Satış Birim Fiyatı</b> gir.<br>
+                        <b>Tamamlandı</b> kutusunu <u>işaretleme</u> henüz.
+                        <span class="yol">/admin/finance/sevkiyat/add/</span>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Paletleri Yükle (QR Terminal ile)</div>
+                    <div class="ac">
+                        Telefona <span class="yol">/inventory/scan/</span> aç.<br>
+                        Tırı seç → her paletin QR kodunu tara.<br>
+                        Her taramada palet otomatik o tıra bağlanır.
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Tır Yola Çıktıktan Sonra: Tamamlandı işaretle</div>
+                    <div class="ac">
+                        Sevkiyat kaydına gir → <b>Tamamlandı</b> kutusunu işaretle → Kaydet.<br>
+                        <b>Otomatik olan şeyler:</b><br>
+                        • Tüm paletler "Teslim Edildi" durumuna geçer<br>
+                        • Müşteri carisine satış tutarı borç olarak işlenir<br>
+                        • Kâr/Zarar hesabı güncellenir
+                    </div>
+                </div>
+            </li>
+        </ol>
+
+        <div class="sg">
+            <div class="sk y">
+                <div class="sl">Tamamlandı = ✅ Olunca</div>
+                Müşteri carisine satış tutarı kadar borç eklenir.<br>
+                Paletler "Teslim Edildi" olur.<br>
+                Kâr/Zarar güncellenir.
+            </div>
+            <div class="sk k">
+                <div class="sl">⚠️ Dikkat</div>
+                Tamamlandı işaretledikten sonra<br>
+                palet ekleme/çıkarma yapma.<br>
+                Önce düzelt, sonra tamamla.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     5. QR TERMİNAL
+     ============================================= -->
+<div class="bolum" id="qr">
+    <div class="bh">
+        <div class="num">5</div>
+        <div><h2>📱 QR Terminal — Sahada Kullanım</h2><p>Telefon ile palet yükleme</p></div>
+    </div>
+    <div class="bb">
+
+        <div class="uyari ipucu">
+            💡 QR terminal <b>internetsiz de çalışır.</b>
+            Taradıklarınız telefonda birikir, bağlantı gelince otomatik gönderilir.
+        </div>
+
+        <ol class="adimlar">
+            <li>
+                <div class="ic">
+                    <div class="tt">Telefonda aç</div>
+                    <div class="ac">
+                        Tarayıcıdan <span class="yol">/inventory/scan/</span> aç.<br>
+                        Ana sayfadaki <b>"📱 QR Terminal"</b> butonuna tıkla.
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Tır seç</div>
+                    <div class="ac">
+                        Ekranda aktif tırlar görünür. Hangi tıra yüklüyorsan onu seç.
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">Palet QR'larını tara</div>
+                    <div class="ac">
+                        Kamera açılır. Paletin üzerindeki QR kodu kameraya göster.<br>
+                        "Yüklendi" mesajı görünce bir sonraki palete geç.
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="ic">
+                    <div class="tt">İnternet yoksa ne olur?</div>
+                    <div class="ac">
+                        Ekranda <b>🔴 OFFLINE</b> yazar.<br>
+                        Taramaya devam edebilirsin — işlemler telefonda birikir.<br>
+                        İnternet gelince ekranın altındaki <b>"Senkronize Et"</b> butonu otomatik çalışır.
+                    </div>
+                </div>
+            </li>
+        </ol>
+
+        <table class="kk">
+            <tr><th>Durum</th><th>Anlamı</th><th>Yapman gereken</th></tr>
+            <tr><td>📡 ONLINE</td><td>Anlık bağlı, veriler hemen gidiyor</td><td>Hiçbir şey, normal kullan</td></tr>
+            <tr><td>📵 OFFLINE</td><td>İnternet yok, veriler bekliyor</td><td>Taramaya devam et</td></tr>
+            <tr><td>⏳ Bekliyor</td><td>Gönderilememiş işlem var</td><td>İnternet gelince otomatik gönderilir</td></tr>
+            <tr><td>⚠️ Çakışma</td><td>Palet başka tıra yüklenmiş</td><td>Hangi tır doğruysa onu seç</td></tr>
+        </table>
+
+        <div class="uyari dikkat">
+            ⚠️ Kamera çalışmıyorsa: Sayfanın altındaki <b>manuel giriş kutusuna</b>
+            palet ID numarasını yazıp "Ekle" butonuna bas.
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     6. PARA AKIŞI
+     ============================================= -->
+<div class="bolum" id="para">
+    <div class="bh">
+        <div class="num">6</div>
+        <div><h2>💰 Para Akışı — Cari Hesaplar</h2><p>Kim kime ne kadar borçlu?</p></div>
+    </div>
+    <div class="bb">
+
+        <div class="akis">
+            <div class="aa"><span class="i">👨‍🌾</span>Müstahsil<br>Mal Verir</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">📈</span>Bize<br>Borçlanırız</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">💸</span>Ödeme<br>Yaparız</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">✅</span>Borç<br>Kapanır</div>
+        </div>
+
+        <div class="akis" style="margin-top:8px;">
+            <div class="aa"><span class="i">🚛</span>Tır<br>Gider</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">📊</span>Müşteri<br>Borçlanır</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">💰</span>Tahsilat<br>Alırız</div>
+            <div class="ok">→</div>
+            <div class="aa"><span class="i">✅</span>Alacak<br>Kapanır</div>
+        </div>
+
+        <h3 style="font-size:14px;margin:16px 0 8px;">Müstahsile Ödeme Yapmak</h3>
+        <ol class="adimlar">
+            <li>
+                <div class="ic">
+                    <div class="tt">Admin → Cari Hareketler → Ekle</div>
+                    <div class="ac">
+                        <b>Müstahsil:</b> Kime ödeme yapıyorsun seç<br>
+                        <b>İşlem Tipi:</b> "Ödeme Yapıldı" seç<br>
+                        <b>Tutar:</b> Ödenen miktarı gir<br>
+                        Kaydet → müstahsil borcu otomatik azalır.
+                        <span class="yol">/admin/finance/carihareket/add/</span>
+                    </div>
+                </div>
+            </li>
+        </ol>
+
+        <h3 style="font-size:14px;margin:16px 0 8px;">Müşteriden Tahsilat Almak</h3>
+        <ol class="adimlar">
+            <li>
+                <div class="ic">
+                    <div class="tt">Admin → Müşteri Hareketleri → Ekle</div>
+                    <div class="ac">
+                        <b>Müşteri:</b> Kim ödedi seç<br>
+                        <b>İşlem Tipi:</b> "Tahsilat / Ödeme Alındı" seç<br>
+                        <b>Tutar:</b> Alınan miktarı gir<br>
+                        Kaydet → alacak otomatik azalır.
+                        <span class="yol">/admin/finance/musterihareket/add/</span>
+                    </div>
+                </div>
+            </li>
+        </ol>
+
+        <div class="uyari tamam">
+            ✅ Ödemeler kısmi olabilir. Örneğin müşteri 50.000₺ borçluysa
+            10.000₺ ödedi, 40.000₺ kaldı diye kayıt atabilirsin.
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     7. BELGELER
+     ============================================= -->
+<div class="bolum" id="belgeler">
+    <div class="bh">
+        <div class="num">7</div>
+        <div><h2>📄 Belge Yazdırma</h2><p>Makbuz, fatura, ekstre nasıl çıkarılır?</p></div>
+    </div>
+    <div class="bb">
+
+        <table class="kk">
+            <tr><th>Belge Türü</th><th>Nerede Bulunur?</th><th>Ne İçin?</th></tr>
+            <tr>
+                <td>Müstahsil Alım Makbuzu</td>
+                <td>Cari Hareketler listesi → "📄 Alım Makbuzu"</td>
+                <td>Alım yapınca müstahsile ver</td>
+            </tr>
+            <tr>
+                <td>Müstahsil Ödeme Makbuzu</td>
+                <td>Cari Hareketler listesi → "📄 Ödeme Makbuzu"</td>
+                <td>Para öderken imzalat</td>
+            </tr>
+            <tr>
+                <td>Müstahsil Cari Ekstre</td>
+                <td>Müstahsiller listesi → "📋 Ekstre"</td>
+                <td>Tüm hareketlerin özeti</td>
+            </tr>
+            <tr>
+                <td>Müşteri Satış Faturası</td>
+                <td>Sevkiyatlar listesi → "🧾 Fatura"</td>
+                <td>Tır giderken müşteriye ver</td>
+            </tr>
+            <tr>
+                <td>Taşıma İrsaliyesi</td>
+                <td>Sevkiyatlar listesi → "📦 İrsaliye"</td>
+                <td>Şoföre ver, yolculuk belgesi</td>
+            </tr>
+            <tr>
+                <td>Müşteri Cari Ekstre</td>
+                <td>Müşteriler listesi → "📋 Ekstre"</td>
+                <td>Borç/alacak tüm geçmiş</td>
+            </tr>
+            <tr>
+                <td>Tahsilat Makbuzu</td>
+                <td>Müşteri Hareketleri → "📄 Makbuz"</td>
+                <td>Para alınca müşteriye ver</td>
+            </tr>
+            <tr>
+                <td>Gider Makbuzu</td>
+                <td>Giderler listesi → "📄 Makbuz"</td>
+                <td>Harcama belgesi</td>
+            </tr>
+            <tr>
+                <td>Aylık Gider Raporu</td>
+                <td>Giderler listesi → "📊 Bu Ay Dönem Raporu"</td>
+                <td>Aylık gider özeti</td>
+            </tr>
+        </table>
+
+        <div class="uyari ipucu">
+            💡 Tüm belgeler <b>A4 boyutunda, logolu ve imza alanı olan</b> resmi formatta çıkar.
+            Yazdır butonuna tıklayınca PDF açılır, oradan yazdırabilirsin.
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     8. PATRON İÇİN
+     ============================================= -->
+<div class="bolum" id="patron">
+    <div class="bh">
+        <div class="num">8</div>
+        <div><h2>👔 Patron için Özet Bakış</h2><p>Her sabah 2 dakikada durumu anla</p></div>
+    </div>
+    <div class="bb">
+
+        <p style="font-size:13px;color:#555;margin:0 0 14px;">
+            Her gün açman gereken tek sayfa: <a href="/" style="color:var(--g);font-weight:700;">Ana Sayfa</a>
+        </p>
+
+        <table class="kk">
+            <tr><th>Gördüğün Bilgi</th><th>Anlamı</th><th>Eylem Gerekirse</th></tr>
+            <tr>
+                <td>💰 Bu Ay Satış</td>
+                <td>Bu ay teslim edilen malların toplam değeri</td>
+                <td>Düşükse yeni tır çıkar</td>
+            </tr>
+            <tr>
+                <td>🚚 Yoldaki Tırlar</td>
+                <td>Şu an müşteriye giden araç sayısı</td>
+                <td>Sıfırsa yeni sevkiyat oluştur</td>
+            </tr>
+            <tr>
+                <td>📦 Depodaki Stok</td>
+                <td>Depoda bekleyen mal miktarı</td>
+                <td>Çoksa hızlı satış yap</td>
+            </tr>
+            <tr>
+                <td>📈 Net Kâr</td>
+                <td>Toplam satış − toplam gider</td>
+                <td>Negatifse giderleri incele</td>
+            </tr>
+            <tr>
+                <td>⏳ Bekleyen Alacak</td>
+                <td>Müşterilerden henüz tahsil edilmeyen</td>
+                <td>Yüksekse müşteriyi ara</td>
+            </tr>
+            <tr>
+                <td>🌾 Müstahsil Borcu</td>
+                <td>Üreticilere olan toplam borcumuz</td>
+                <td>Yüksekse ödeme yap</td>
+            </tr>
+        </table>
+
+        <div class="sg">
+            <div class="sk y">
+                <div class="sl">✅ İyi İşaret</div>
+                Net kâr yeşil (pozitif)<br>
+                Depoda stok var<br>
+                Müşteri alacakları azalıyor<br>
+                Tırlar yolda
+            </div>
+            <div class="sk k">
+                <div class="sl">⚠️ Dikkat Edilmesi Gereken</div>
+                Net kâr kırmızı (negatif)<br>
+                Bekleyen alacak çok yüksek<br>
+                Müstahsil borcu birikiyor<br>
+                Depo dolup taşıyor
+            </div>
+        </div>
+
+        <div class="uyari tamam">
+            ✅ <b>Kural basit:</b> Her gün ana sayfayı aç, sayılara bak.
+            Bir şey dikkatini çekerse admin paneline gir ve detaya bak.
+            <a href="/" style="color:var(--gd);font-weight:700;">Ana sayfaya git →</a>
+        </div>
+    </div>
+</div>
+
+<!-- YARDIM ALT KISMI -->
+<div style="text-align:center;padding:28px 0;color:#888;font-size:13px;">
+    <p>Daha fazla yardım için sistem yöneticisine ulaşın.</p>
+    <p style="margin-top:8px;">
+        <a href="/" style="color:var(--g);font-weight:600;">← Ana Sayfaya Dön</a>
+        &nbsp;|&nbsp;
+        <a href="/admin/" style="color:var(--b);font-weight:600;">Yönetim Paneli →</a>
+    </p>
+</div>
+
+</div>{# end .pw #}
+{% endblock %}
