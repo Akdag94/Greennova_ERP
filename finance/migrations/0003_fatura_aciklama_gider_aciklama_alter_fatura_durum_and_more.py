@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finance', '0002_remove_fatura_fatura_dosyası_remove_gider_aciklama_and_more'),
+        ('finance', '0002_remove_fatura_fields'),
     ]
 
     operations = [
