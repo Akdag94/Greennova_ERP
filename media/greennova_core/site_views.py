@@ -6,7 +6,7 @@
 
 # __sig__: 76a253b5 | build:2026 | dev:609191fb
 """
-Ana sayfa (patron paneli) ve yardım bölümü.
+Ana sayfa (yönetici paneli) ve yardım bölümü.
 Her şeyi tek bakışta göster — karmaşık değil, net ve sade.
 """
 
@@ -37,7 +37,7 @@ def _fk(sayi):
 
 
 # ============================================================
-# ANA SAYFA — PATRON PANELİ
+# ANA SAYFA — YÖNETİCİ PANELİ
 # ============================================================
 def anasayfa(request):
     # Geç import (circular import önlemi)

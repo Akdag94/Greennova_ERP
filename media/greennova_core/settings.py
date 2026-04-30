@@ -126,8 +126,8 @@ IMPORT_EXPORT_ENCODING = 'utf-8-sig'
 # ==========================================================
 # ŞİRKET BİLGİLERİ (PDF belgelerde görünür)
 # ==========================================================
-COMPANY_NAME = 'GreenNova Tarım Ürünleri'
-COMPANY_ADDRESS = 'Bursa / Türkiye'
+COMPANY_NAME = 'GREENNOVA TARIM İÇ VE DIŞ TİCARET LİMİTED ŞİRKETİ'
+COMPANY_ADDRESS = 'ÖĞRETMENLER MAH. 2971. SK. MAYDEN NO: 1 A TARSUS/ MERSİN'
 COMPANY_PHONE = ''
-COMPANY_VERGI_NO = ''
-COMPANY_VERGI_DAIRESI = ''
+COMPANY_VERGI_NO = '4111211857'
+COMPANY_VERGI_DAIRESI = 'KIZILMURAT'

@@ -2,11 +2,10 @@
 # Developer: Azat Akdag
 # Build ID: 76a253b51f848f4345737a09a19cb86a599614c210c9f09494fd35ebcfbf1eae
 # © 2026 GreenNova Tarim. All rights reserved.
-# Contact: azat.akdag@greennova
 
 # __sig__: 76a253b5 | build:2026 | dev:609191fb
 """
-Ana sayfa (patron paneli) ve yardım bölümü.
+Ana sayfa  ve yardım bölümü.
 Her şeyi tek bakışta göster — karmaşık değil, net ve sade.
 """
 
@@ -37,7 +36,7 @@ def _fk(sayi):
 
 
 # ============================================================
-# ANA SAYFA — PATRON PANELİ
+# ANA SAYFA — 
 # ============================================================
 def anasayfa(request):
     # Geç import (circular import önlemi)
